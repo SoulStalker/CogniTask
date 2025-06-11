@@ -15,9 +15,9 @@ type TaskRepository interface {
 	Add(task Task) (Task, error)    // добавляем новую задачу
 	MarkDone(id uint) (bool, error) // Закрыавет задачу вернет что закрыл или нет и ошибку
 	GetPending() ([]Task, error)    // Список всех задач (не закрытых)
-	EditDate(task Task, newDate time.Time) (Task, error)
+	EditDate(id uint, newDate time.Time) (Task, error)
 	Delete(id uint) error // удалить задачу
 	GetExpired(deadline time.Time) ([]Task, error)
-	DeleteOldDone(N_days int) error
+	DeleteOldDone(N_days int) (int64, error)
 	GetByID(id uint) (Task, error)
 }

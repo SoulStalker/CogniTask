@@ -12,10 +12,12 @@ type Task struct {
 }
 
 type TaskRepository interface {
-	Add(task Task) (Task, error) // добавляем новую задачу
-	Close() (bool, error)        // Закрыавет задачу вернет что закрыл или нет и ошибку
-	GetAll() []Task              // Список всех задач (не закрытых)
+	Add(task Task) (Task, error)    // добавляем новую задачу
+	MarkDone(id uint) (bool, error) // Закрыавет задачу вернет что закрыл или нет и ошибку
+	GetPending() ([]Task, error)    // Список всех задач (не закрытых)
 	EditDate(task Task, newDate time.Time) (Task, error)
 	Delete(id uint) error // удалить задачу
-	// какие еще методы нужны в задаче?
+	GetExpired(deadline time.Time) ([]Task, error)
+	DeleteOldDone(N_days int) error
+	GetByID(id uint) (Task, error)
 }

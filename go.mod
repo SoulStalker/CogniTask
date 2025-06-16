@@ -3,6 +3,7 @@ module github.com/SoulStalker/cognitask
 go 1.23.6
 
 require (
+	gopkg.in/telebot.v3 v3.3.8
 	gorm.io/driver/sqlite v1.6.0
 	gorm.io/gorm v1.30.0
 )

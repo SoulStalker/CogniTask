@@ -28,6 +28,7 @@ func (r *GormTaskRepo) Add(task domain.Task) (domain.Task, error) {
 func (r *GormTaskRepo) MarkDone(id uint) (bool, error) {
 	err := r.DB.Model(&domain.Task{}).Where("id=?", id).Updates(domain.Task{
 		Closed: true,
+		ClosedAt: time.Now(),
 	}).Error
 	if err != nil {
 		return false, err

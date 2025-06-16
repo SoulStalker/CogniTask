@@ -7,8 +7,8 @@ type Task struct {
 	Description string    `gorm:"size:200; not null" json:"description"`
 	Deadline    time.Time `json:"deadline"`
 	CreatedAt   time.Time `gorm:"autoCreateTime" json:"created_at"`
-	Closed      bool      `json:"closed"`
-	ClosedAt    time.Time `json:"closed_at"`
+	Closed      bool      `gorm:"default:false" json:"closed"`
+	ClosedAt    time.Time `gorm:"default:null" json:"closed_at"`
 }
 
 type TaskRepository interface {

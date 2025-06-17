@@ -15,5 +15,5 @@ func HelpHandler(c telebot.Context) error {
 
 func AddHandler(c telebot.Context) error {
 	return c.Send(messages.BotMessages.InputTaskText)
-	// todo продолжаем тут
+	// todo включаем состяние ожидания текста
 }

@@ -34,13 +34,13 @@ func main() {
 	// run bot polling
 
 	b, err := tele.NewBot(tele.Settings{
-		Token:  cfg.Bot_token,
+		Token:  cfg.BotToken,
 		Poller: &tele.LongPoller{Timeout: 10 * time.Second},
 	})
 	if err != nil {
 		return
 	}
-	b.Use(middleware.AuthMiddleware(cfg.Chat_ID))
+	b.Use(middleware.AuthMiddleware(cfg.ChatId))
 	b.Handle("/start", handlers.StartHandler)
 	b.Handle("/help", handlers.HelpHandler)
 	b.Handle("/add", handlers.AddHandler)

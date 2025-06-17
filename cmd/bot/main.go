@@ -9,6 +9,7 @@ import (
 	"github.com/SoulStalker/cognitask/internal/config"
 	"github.com/SoulStalker/cognitask/internal/handlers"
 	"github.com/SoulStalker/cognitask/internal/infra"
+	"github.com/SoulStalker/cognitask/internal/middleware"
 	"github.com/SoulStalker/cognitask/internal/usecase"
 	"gorm.io/gorm/logger"
 )
@@ -30,7 +31,6 @@ func main() {
 	_ = usecase.NewTaskService(taskRepo)
 
 	// init handler
-
 	// run bot polling
 
 	b, err := tele.NewBot(tele.Settings{
@@ -40,10 +40,11 @@ func main() {
 	if err != nil {
 		return
 	}
-	b.Handle("/start", handlers.StartHandler) 
-	b.Handle(tele.OnText, func(ctx tele.Context) error {
-		return ctx.Send("Hello")
-	})
+	b.Use(middleware.AuthMiddleware(cfg.Chat_ID))
+	b.Handle("/start", handlers.StartHandler)
+	b.Handle("/help", handlers.HelpHandler)
+	b.Handle("/add", handlers.AddHandler)
+
 	b.Start()
 
 }

@@ -5,7 +5,15 @@ import (
 	"gopkg.in/telebot.v3"
 )
 
-// сюда пишем код, который обрабатывает команды /add, /list и т.д.
 func StartHandler(c telebot.Context) error {
 	return c.Send(messages.BotMessages.Start)
+}
+
+func HelpHandler(c telebot.Context) error {
+	return c.Send(messages.BotMessages.Help)
+}
+
+func AddHandler(c telebot.Context) error {
+	return c.Send(messages.BotMessages.InputTaskText)
+	// todo продолжаем тут
 }

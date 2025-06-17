@@ -6,14 +6,17 @@ import (
 
 	tele "gopkg.in/telebot.v3"
 
+	"github.com/SoulStalker/cognitask/internal/config"
 	"github.com/SoulStalker/cognitask/internal/infra"
 	"github.com/SoulStalker/cognitask/internal/usecase"
 	"gorm.io/gorm/logger"
 )
 
 func main() {
+	//load config
+	cfg := config.MustLoad()
 	// init storage
-	dbConfig := infra.DBConfig{DSN: "bot.db", Logger: logger.Default}
+	dbConfig := infra.DBConfig{DSN: cfg.DSN, Logger: logger.Default}
 	db, err := infra.InitDB(dbConfig)
 	if err != nil {
 		log.Fatal(err)
@@ -30,7 +33,7 @@ func main() {
 	// run bot polling
 
 	b, err := tele.NewBot(tele.Settings{
-		Token:  "...",
+		Token:  cfg.Bot_token,
 		Poller: &tele.LongPoller{Timeout: 10 * time.Second},
 	})
 	if err != nil {

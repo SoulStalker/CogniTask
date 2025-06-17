@@ -7,6 +7,7 @@ import (
 	tele "gopkg.in/telebot.v3"
 
 	"github.com/SoulStalker/cognitask/internal/config"
+	"github.com/SoulStalker/cognitask/internal/handlers"
 	"github.com/SoulStalker/cognitask/internal/infra"
 	"github.com/SoulStalker/cognitask/internal/usecase"
 	"gorm.io/gorm/logger"
@@ -39,6 +40,7 @@ func main() {
 	if err != nil {
 		return
 	}
+	b.Handle("/start", handlers.StartHandler) 
 	b.Handle(tele.OnText, func(ctx tele.Context) error {
 		return ctx.Send("Hello")
 	})

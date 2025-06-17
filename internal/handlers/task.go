@@ -6,6 +6,6 @@ import (
 )
 
 // сюда пишем код, который обрабатывает команды /add, /list и т.д.
-func startHandler(c telebot.Context) error {
+func StartHandler(c telebot.Context) error {
 	return c.Send(messages.BotMessages.Start)
 }

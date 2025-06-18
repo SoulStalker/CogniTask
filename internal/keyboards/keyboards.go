@@ -18,6 +18,8 @@ const (
 
 	// Кнопки управления задачами
 	BtnComplete  = "✅ Выполнить"
+	BtnDelete    = "🗑 Удалить"
+	BtnEditDate  = "📅 Изменить дату"
 	BtnRandomPic = "🎲 Random Pic"
 )
 
@@ -45,21 +47,40 @@ func GetDateSelectionKeyboard() *tele.ReplyMarkup {
 	return kb
 }
 
-// GetTaskControlKeyboard клавиатура для управления задачей
-func GetTaskControlKeyboard(taskID uint) *tele.ReplyMarkup {
+// CreateTaskKeyboard клавиатура для управления задачей
+func CreateTaskKeyboard(taskID uint) *tele.ReplyMarkup {
 	kb := &tele.ReplyMarkup{}
 
 	// Inline кнопки с callback data
 	btnComplete := kb.Data(BtnComplete, "complete", fmt.Sprintf("%d", taskID))
 	btnRandomPic := kb.Data(BtnRandomPic, "random_pic", "")
+	btnDelete := kb.Data(BtnDelete, "delete_task", fmt.Sprintf("%d", taskID))
+	btnEditDate := kb.Data(BtnEditDate, "edit_date", fmt.Sprintf("%d", taskID))
 
 	// Раскладка
 	kb.Inline(
 		kb.Row(btnComplete),
-		kb.Row(btnRandomPic), // todo или сюда лучше отмену поставить?
+		kb.Row(btnEditDate, btnDelete),
+		kb.Row(btnRandomPic),
 	)
 
 	return kb
+}
+
+// CreateSettingsKeyboard создает клавиатуру для настроек
+func CreateSettingsKeyboard() *tele.ReplyMarkup {
+	markup := &tele.ReplyMarkup{}
+
+	// Кнопки настроек (заготовка для будущего)
+	btnNotifications := markup.Data("🔔 Уведомления", "settings_notifications")
+	btnAutoDelete := markup.Data("🗑 Авто-удаление", "settings_auto_delete")
+
+	markup.Inline(
+		markup.Row(btnNotifications),
+		markup.Row(btnAutoDelete),
+	)
+
+	return markup
 }
 
 // GetRemoveKeyboard удаляет reply клаву

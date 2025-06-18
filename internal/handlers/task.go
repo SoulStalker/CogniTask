@@ -5,9 +5,10 @@ import (
 	"log"
 
 	"github.com/SoulStalker/cognitask/internal/fsm"
+	"github.com/SoulStalker/cognitask/internal/keyboards"
 	"github.com/SoulStalker/cognitask/internal/messages"
 	"github.com/SoulStalker/cognitask/internal/usecase"
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 )
 
 type TaskHandler struct {
@@ -25,7 +26,7 @@ func NewTaskHandler(fsm *fsm.FSMService, service *usecase.TaskService, ctx conte
 }
 
 // Start хендлер для обработки команды Start
-func (h *TaskHandler) Start(c telebot.Context) error {
+func (h *TaskHandler) Start(c tele.Context) error {
 	if err := h.fsmService.ClearState(h.ctx, c.Sender().ID); err != nil {
 		log.Printf("Failed to clear state: %v", err)
 	}
@@ -33,12 +34,12 @@ func (h *TaskHandler) Start(c telebot.Context) error {
 }
 
 // Help хендлер для обработки команды Help
-func (h *TaskHandler) Help(c telebot.Context) error {
+func (h *TaskHandler) Help(c tele.Context) error {
 	return c.Send(messages.BotMessages.Help)
 }
 
 // Add  хендлер для обработки команды  Add
-func (h *TaskHandler) Add(c telebot.Context) error {
+func (h *TaskHandler) Add(c tele.Context) error {
 	userID := c.Sender().ID
 
 	if err := h.fsmService.ClearState(h.ctx, c.Sender().ID); err != nil {
@@ -56,35 +57,56 @@ func (h *TaskHandler) Add(c telebot.Context) error {
 	return c.Send(messages.BotMessages.InputTaskText)
 }
 
-// TaskName в фсм состянии ждет название таска
-func (h *TaskHandler) TaskName(c telebot.Context) error {
-	// todo хорошо бы переделать под кнопки с датами
+// HandleText - это единый обработчик для всех текстовых сообщений.
+// Он работает как маршрутизатор на основе состояния FSM.
+// Оказывается telebot не умеет пропускать сообщения без обработки :(
+func (h *TaskHandler) HandleText(c tele.Context) error {
 	userID := c.Sender().ID
 
-	// Текущще состоние фсм
 	state, err := h.fsmService.GetState(h.ctx, userID)
 	if err != nil {
 		log.Printf("Failed to get state: %v", err)
 		return c.Send(messages.BotMessages.ErrorTryAgain)
 	}
 
-	// Сверяем состояние
-	if state.State == fsm.StateWaitingTaskText {
-		state.TaskText = c.Text()
-		// переходим на следующее состояние
-		state.State = fsm.StateWaitingTaskDate
-
-		// Надо сохранить новое состояние
-		if err := h.fsmService.SetState(h.ctx, userID, state); err != nil {
-			log.Printf("Failed to update state: %v", err)
-			return c.Send(messages.BotMessages.ErrorTryAgain)
-		}
-
-		log.Printf("Task text saved: %s, moved to state: %s", state.TaskText, state.State)
-		return c.Send(messages.BotMessages.InputNewDate)
+	switch state.State {
+	case fsm.StateWaitingTaskText:
+		return h.processTaskText(c, state)
+	case fsm.StateWaitingTaskDate:
+		return h.processTaskDate(c, state)
 	}
 
-	// Если пользователь не в состоянии FSM, игнорируем сообщение
-	// Или можно обработать как обычный текст
 	return nil
+}
+
+// TaskName в фсм состянии ждет название таска
+func (h *TaskHandler) processTaskText(c tele.Context, state *fsm.FSMData) error {
+	userID := c.Sender().ID
+	state.TaskText = c.Text()
+	state.State = fsm.StateWaitingTaskDate
+
+	// Надо сохранить новое состояние
+	if err := h.fsmService.SetState(h.ctx, userID, state); err != nil {
+		log.Printf("Failed to update state: %v", err)
+		return c.Send(messages.BotMessages.ErrorTryAgain)
+	}
+
+	log.Printf("Task text saved: %s, moved to state: %s", state.TaskText, state.State)
+	return c.Send(messages.BotMessages.InputNewDate, keyboards.GetDateSelectionKeyboard())
+}
+
+func (h *TaskHandler) processTaskDate(c tele.Context, state *fsm.FSMData) error {
+	userID := c.Sender().ID
+	state.TaskText = c.Text()
+	state.State = fsm.StateWaitingTaskCategory
+
+	if err := h.fsmService.SetState(h.ctx, userID, state); err != nil {
+		log.Printf("Failed to update state: %v", err)
+		return c.Send(messages.BotMessages.ErrorTryAgain)
+	}
+
+	log.Printf("Task date saved: %s, moved to state: %s", state.TaskDate, state.State)
+	log.Printf("Current state: !!!     %v    !!!", state)
+	return c.Send(messages.BotMessages.InputNewDate, keyboards.GetDateSelectionKeyboard())
+
 }

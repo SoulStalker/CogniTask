@@ -58,6 +58,7 @@ func (h *TaskHandler) Add(c telebot.Context) error {
 
 // TaskName в фсм состянии ждет название таска
 func (h *TaskHandler) TaskName(c telebot.Context) error {
+	// todo хорошо бы переделать под кнопки с датами
 	userID := c.Sender().ID
 
 	// Текущще состоние фсм

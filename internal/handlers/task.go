@@ -107,7 +107,11 @@ func (h *TaskHandler) processTaskText(c tele.Context, state *fsm.FSMData) error 
 func (h *TaskHandler) processTaskDate(c tele.Context, state *fsm.FSMData) error {
 	userID := c.Sender().ID
 	state.TaskDate = c.Text()
-	// state.State = fsm.StateWaitingTaskCategory
+
+	taskDeadline, err := keyboards.ParseDate(state.TaskDate)
+	if err != nil {
+		return c.Send(err.Error())
+	}
 
 	if err := h.fsmService.SetState(h.ctx, userID, state); err != nil {
 		log.Printf("Failed to update state: %v", err)
@@ -116,13 +120,8 @@ func (h *TaskHandler) processTaskDate(c tele.Context, state *fsm.FSMData) error 
 
 	log.Printf("Task date saved: %s, moved to state: %s", state.TaskDate, state.State)
 	log.Printf("Current state: %v", state)
-	// todo добавить категорию
-	// return c.Send(messages.BotMessages.SelectCategory) это на потом
 	taskDescription := state.TaskText
-	taskDeadline, err := keyboards.ParseDate(state.TaskDate)
-	if err != nil {
-		return c.Send(err.Error())
-	}
+
 	task, err := h.service.Add(domain.Task{
 		Description: taskDescription,
 		Deadline:    taskDeadline,
@@ -130,7 +129,6 @@ func (h *TaskHandler) processTaskDate(c tele.Context, state *fsm.FSMData) error 
 	if err != nil {
 		return c.Send(err.Error())
 	}
-	h.fsmService.ClearState(h.ctx, userID) // возмжно надо будет убрать при расширении
+	h.fsmService.ClearState(h.ctx, userID)
 	return c.Send(formatTask(task))
-	// todo форматируй вывод задачи
 }

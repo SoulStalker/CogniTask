@@ -12,6 +12,9 @@ type Messages struct {
 	InputTaskText  string
 	ErrorSomeError string
 	ErrorTryAgain  string
+
+    // Replies
+    TaskAdded string
 }
 
 var BotMessages = Messages{
@@ -25,5 +28,6 @@ var BotMessages = Messages{
 	InputTaskText:  "Введи описание задачи: ",
 	ErrorSomeError: "Произошла ошибка. Попробуйте позже.",
 	ErrorTryAgain:  "Произошла ошибка. Попробуйте заново.",
+    TaskAdded: "☑️ Задача успешно добавлена",
 }
 

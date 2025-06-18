@@ -2,6 +2,7 @@ package keyboards
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	tele "gopkg.in/telebot.v3"
@@ -77,8 +78,16 @@ func GetTomorrowDate() string {
 }
 
 // todo надо подумать может лучше просто принимать цифру текущего месяца
-// Парсинг даты из строки (для календаря)
+// Парсинг даты из строки
 func ParseDate(dateStr string) (time.Time, error) {
+	switch dateStr {
+	case BtnToday:
+		dateStr = GetTodayDate()
+	case BtnTomorrow:
+		dateStr = GetTomorrowDate()
+	}
+
+	log.Printf("Выбрана дата для парсинга: %s", dateStr)
 	// Поддерживаемые форматы
 	formats := []string{
 		"2006-01-02", // 2024-12-25
@@ -93,5 +102,5 @@ func ParseDate(dateStr string) (time.Time, error) {
 		}
 	}
 
-	return time.Time{}, fmt.Errorf("неподдерживаемый формат даты. Используйте: DD.MM.YYYY или YYYY-MM-DD")
+	return time.Time{}, fmt.Errorf("неподдерживаемый формат даты.\nИспользуйте: DD.MM.YYYY или YYYY-MM-DD")
 }

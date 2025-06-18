@@ -31,7 +31,7 @@ type Config struct {
 }
 
 func MustLoad() *Config {
-	configPath := "./config/local.yaml"
+	configPath := "./config/local.yml"
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
 		log.Fatalf("config file does not exist: %s", configPath)
 	}

@@ -3,3 +3,4 @@ bot.db
 *.json
 local.yml
 dump.rdb
+*.rdb

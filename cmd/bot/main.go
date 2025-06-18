@@ -73,6 +73,7 @@ func main() {
 	b.Handle("/start", h.Start)
 	b.Handle("/help", h.Help)
 	b.Handle("/add", h.Add)
+	b.Handle("/pending", h.Pending)
 	b.Handle(tele.OnText, h.HandleText)
 
 

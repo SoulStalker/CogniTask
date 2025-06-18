@@ -39,6 +39,14 @@ func (h *TaskHandler) Help(c tele.Context) error {
 	return c.Send(messages.BotMessages.Help)
 }
 
+func (h *TaskHandler) Pending(c tele.Context) error {
+	taskList, err := h.service.GetPending()
+	if err != nil {
+		return c.Send(err.Error())
+	}
+	return c.Send(formatTaskList(taskList))
+}
+
 // Add  хендлер для обработки команды  Add
 func (h *TaskHandler) Add(c tele.Context) error {
 	userID := c.Sender().ID
@@ -115,10 +123,14 @@ func (h *TaskHandler) processTaskDate(c tele.Context, state *fsm.FSMData) error 
 	if err != nil {
 		return c.Send(err.Error())
 	}
-	h.service.Add(domain.Task{
+	task, err := h.service.Add(domain.Task{
 		Description: taskDescription,
-		Deadline: taskDeadline,
+		Deadline:    taskDeadline,
 	})
+	if err != nil {
+		return c.Send(err.Error())
+	}
 	h.fsmService.ClearState(h.ctx, userID) // возмжно надо будет убрать при расширении
-	return c.Send(messages.BotMessages.TaskAdded)
+	return c.Send(formatTask(task))
+	// todo форматируй вывод задачи
 }

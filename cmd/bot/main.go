@@ -39,9 +39,11 @@ func main() {
 
 	// init repo
 	taskRepo := infra.New(db)
+	mediaRepo := infra.NewMediaRepo(db)
 
 	// init service
 	taskUC := usecase.NewTaskService(taskRepo)
+	mediaUC := usecase.NewMediaService(mediaRepo)
 
 	// init redis
 	rdb := redis.NewClient(&redis.Options{
@@ -61,6 +63,7 @@ func main() {
 
 	// init handler
 	h := handlers.NewTaskHandler(fsmService, taskUC, ctx)
+	mh := handlers.NewMediaHandler(mediaUC, ctx)
 
 	// run bot polling
 	b, err := tele.NewBot(tele.Settings{
@@ -81,6 +84,8 @@ func main() {
 	b.Handle(keyboards.BtnCancel, h.Cancel)
 	b.Handle(tele.OnCallback, h.Cancel)
 	b.Handle(tele.OnText, h.HandleText)
+
+	b.Handle(tele.OnMedia, mh.Create)
 
 	// Graceful shutdown
 	go func() {

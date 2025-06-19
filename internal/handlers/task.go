@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"strconv"
 
@@ -39,12 +40,11 @@ func (h *TaskHandler) Pending(c tele.Context) error {
 
 	var rows [][]tele.InlineButton
 	for _, task := range tasks {
-		btn := 
-		tele.InlineButton{
-			Unique: "complete_task",
-			Text:   "✅ " + task.Description,
-			Data:   strconv.Itoa(int(task.ID)), // сюда попадёт в c.Callback().Data
-		}
+		btn := tele.InlineButton{
+            Unique: keyboards.BtnComplete.Unique,
+            Text:   "✅ " + task.Description, 
+            Data:   fmt.Sprint(task.ID), 
+        }
 		rows = append(rows, []tele.InlineButton{btn})
 	}
 
@@ -88,7 +88,7 @@ func (h *TaskHandler) HandleText(c tele.Context) error {
 	case fsm.StateWaitingTaskDate:
 		return h.processTaskDate(c, state)
 	default:
-		return c.Send("Task number ", keyboards.CreateTaskKeyboard(1))
+		return nil
 	}
 
 }

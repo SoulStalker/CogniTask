@@ -76,7 +76,7 @@ func main() {
 	b.Handle("/add", h.Add)
 	b.Handle("/pending", h.Pending)
 	b.Handle(tele.OnText, h.HandleText)
-	b.Handle(keyboards.BtnCompleteTask, h.Complete)
+	b.Handle(keyboards.BtnComplete, h.Complete)
 
 	// Graceful shutdown
 	go func() {

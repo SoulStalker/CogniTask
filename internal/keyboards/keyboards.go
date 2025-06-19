@@ -15,19 +15,14 @@ const (
 	BtnSkipDate = "⏭️ Пропустить"
 	BtnCancel   = "🚫 Отмена"
 
-	// Кнопки управления задачами
-	BtnComplete  = "✅ Выполнить"
-	BtnDelete    = "🗑 Удалить"
-	BtnEditDate  = "📅 Изменить дату"
-	BtnRandomPic = "🎲 Random Pic"
 )
 
 // Глобальные кнопки для регистрации хендлеров
 var (
-	BtnCompleteTask = &tele.Btn{Unique: "complete_task"}
-	BtnDeleteTask   = &tele.Btn{Unique: "delete_task"}
-	BtnEditTaskDate = &tele.Btn{Unique: "edit_date"}
-	BtnRandomPicM   = &tele.Btn{Unique: "random_pic"}
+	BtnComplete = &tele.InlineButton{Unique: "complete_task", Text: "✅ Выполнить"}
+	BtnDelete   = &tele.InlineButton{Unique: "delete_task", Text: "🗑 Удалить"}
+	BtnEditDate = &tele.InlineButton{Unique: "edit_date", Text: "📅 Изменить дату"}
+	BtnRandomPic   = &tele.InlineButton{Unique: "random_pic", Text: "🎲 Random Pic"}
 )
 
 // GetDateSelectionKeyboard клавиатура для выбора даты задачи
@@ -59,10 +54,10 @@ func CreateTaskKeyboard(taskID uint) *tele.ReplyMarkup {
 	kb := &tele.ReplyMarkup{}
 
 	// Inline кнопки с callback data
-	btnComplete := kb.Data(BtnComplete, BtnCompleteTask.Unique, fmt.Sprintf("%d", taskID))
-	btnRandomPic := kb.Data(BtnRandomPic, BtnRandomPicM.Unique, "")
-	btnDelete := kb.Data(BtnDelete, BtnDeleteTask.Unique, fmt.Sprintf("%d", taskID))
-	btnEditDate := kb.Data(BtnEditDate, BtnEditTaskDate.Unique, fmt.Sprintf("%d", taskID))
+	btnComplete := kb.Data(BtnComplete.Text, BtnComplete.Unique, fmt.Sprintf("%d", taskID))
+	btnRandomPic := kb.Data(BtnRandomPic.Text, BtnRandomPic.Unique, "")
+	btnDelete := kb.Data(BtnDelete.Text, BtnDelete.Unique, fmt.Sprintf("%d", taskID))
+	btnEditDate := kb.Data(BtnEditDate.Text, BtnEditDate.Unique, fmt.Sprintf("%d", taskID))
 
 	// Раскладка
 	kb.Inline(

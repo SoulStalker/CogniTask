@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"log"
+	"strconv"
 
 	"github.com/SoulStalker/cognitask/internal/domain"
 	"github.com/SoulStalker/cognitask/internal/fsm"
@@ -83,9 +84,10 @@ func (h *TaskHandler) HandleText(c tele.Context) error {
 		return h.processTaskText(c, state)
 	case fsm.StateWaitingTaskDate:
 		return h.processTaskDate(c, state)
+	default:
+		return c.Send("Task number ", keyboards.CreateTaskKeyboard(1))
 	}
 
-	return nil
 }
 
 // TaskName в фсм состянии ждет название таска
@@ -129,6 +131,23 @@ func (h *TaskHandler) processTaskDate(c tele.Context, state *fsm.FSMData) error 
 	if err != nil {
 		return c.Send(err.Error())
 	}
-	h.fsmService.ClearState(h.ctx, userID)
+	err = h.fsmService.ClearState(h.ctx, userID)
+	if err != nil {
+		return c.Send(err.Error())
+	}
 	return c.Send(formatTask(task))
+}
+
+func (h *TaskHandler) Complete(c tele.Context) error {
+	strTaskID := c.Callback().Data
+	taskID, err := strconv.Atoi(strTaskID)
+	log.Printf("Task ID: %d", taskID)
+	if err != nil {
+		return c.Send(err.Error())
+	}
+	_, err = h.service.MarkDone(uint(taskID))
+	if err != nil {
+		return err
+	}
+	return c.Edit("Task completed")
 }

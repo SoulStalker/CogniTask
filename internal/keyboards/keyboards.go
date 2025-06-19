@@ -2,7 +2,6 @@ package keyboards
 
 import (
 	"fmt"
-	"log"
 	"time"
 
 	tele "gopkg.in/telebot.v3"
@@ -21,6 +20,14 @@ const (
 	BtnDelete    = "🗑 Удалить"
 	BtnEditDate  = "📅 Изменить дату"
 	BtnRandomPic = "🎲 Random Pic"
+)
+
+// Глобальные кнопки для регистрации хендлеров
+var (
+	BtnCompleteTask = &tele.Btn{Unique: "complete_task"}
+	BtnDeleteTask   = &tele.Btn{Unique: "delete_task"}
+	BtnEditTaskDate = &tele.Btn{Unique: "edit_date"}
+	BtnRandomPicM   = &tele.Btn{Unique: "random_pic"}
 )
 
 // GetDateSelectionKeyboard клавиатура для выбора даты задачи
@@ -52,10 +59,10 @@ func CreateTaskKeyboard(taskID uint) *tele.ReplyMarkup {
 	kb := &tele.ReplyMarkup{}
 
 	// Inline кнопки с callback data
-	btnComplete := kb.Data(BtnComplete, "complete", fmt.Sprintf("%d", taskID))
-	btnRandomPic := kb.Data(BtnRandomPic, "random_pic", "")
-	btnDelete := kb.Data(BtnDelete, "delete_task", fmt.Sprintf("%d", taskID))
-	btnEditDate := kb.Data(BtnEditDate, "edit_date", fmt.Sprintf("%d", taskID))
+	btnComplete := kb.Data(BtnComplete, BtnCompleteTask.Unique, fmt.Sprintf("%d", taskID))
+	btnRandomPic := kb.Data(BtnRandomPic, BtnRandomPicM.Unique, "")
+	btnDelete := kb.Data(BtnDelete, BtnDeleteTask.Unique, fmt.Sprintf("%d", taskID))
+	btnEditDate := kb.Data(BtnEditDate, BtnEditTaskDate.Unique, fmt.Sprintf("%d", taskID))
 
 	// Раскладка
 	kb.Inline(
@@ -108,7 +115,6 @@ func ParseDate(dateStr string) (time.Time, error) {
 		dateStr = GetTomorrowDate()
 	}
 
-	log.Printf("Выбрана дата для парсинга: %s", dateStr)
 	// Поддерживаемые форматы
 	formats := []string{
 		"2006-01-02", // 2024-12-25

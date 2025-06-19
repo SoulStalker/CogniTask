@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/SoulStalker/cognitask/internal/keyboards"
 	"log"
 	"os"
 	"os/signal"
@@ -75,7 +76,7 @@ func main() {
 	b.Handle("/add", h.Add)
 	b.Handle("/pending", h.Pending)
 	b.Handle(tele.OnText, h.HandleText)
-
+	b.Handle(keyboards.BtnCompleteTask, h.Complete)
 
 	// Graceful shutdown
 	go func() {

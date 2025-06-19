@@ -27,5 +27,5 @@ func (h *TaskHandler) Cancel(c tele.Context) error {
 	if err != nil {
 		return c.Send(err.Error())
 	}
-	return c.Send(messages.BotMessages.Help)
+	return c.Send(messages.BotMessages.Help, tele.RemoveKeyboard)
 }

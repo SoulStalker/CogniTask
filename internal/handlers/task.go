@@ -102,35 +102,15 @@ func (h *TaskHandler) processTaskText(c tele.Context, state *fsm.FSMData) error 
 
 // processTaskDate в фсм состянии ждет дату таски
 func (h *TaskHandler) processTaskDate(c tele.Context, state *fsm.FSMData) error {
-	userID := c.Sender().ID
 	state.TaskDate = c.Text()
 
-	taskDeadline, err := keyboards.ParseDate(state.TaskDate)
+	err := h.createTask(c, state)
 	if err != nil {
 		return c.Send(err.Error())
 	}
 
-	if err := h.fsmService.SetState(h.ctx, userID, state); err != nil {
-		log.Printf("Failed to update state: %v", err)
-		return c.Send(messages.BotMessages.ErrorTryAgain)
-	}
+	return nil
 
-	log.Printf("Task date saved: %s, moved to state: %s", state.TaskDate, state.State)
-	log.Printf("Current state: %v", state)
-	taskDescription := state.TaskText
-
-	task, err := h.service.Add(domain.Task{
-		Description: taskDescription,
-		Deadline:    taskDeadline,
-	})
-	if err != nil {
-		return c.Send(err.Error())
-	}
-	err = h.fsmService.ClearState(h.ctx, userID)
-	if err != nil {
-		return c.Send(err.Error())
-	}
-	return c.Send(formatTask(task))
 }
 
 // Complete закрытие задачи
@@ -146,4 +126,26 @@ func (h *TaskHandler) Complete(c tele.Context) error {
 		return err
 	}
 	return c.Edit("✅ Задача завершена")
+}
+
+func (h *TaskHandler) createTask(c tele.Context, state *fsm.FSMData) error {
+	taskDescription := state.TaskText
+	taskDeadline, err := keyboards.ParseDate(state.TaskDate)
+	if err != nil {
+		return c.Send(err.Error())
+	}
+
+	task, err := h.service.Add(domain.Task{
+		Description: taskDescription,
+		Deadline:    taskDeadline,
+	})
+	if err != nil {
+		return c.Send(err.Error())
+	}
+	err = h.fsmService.ClearState(h.ctx, c.Sender().ID)
+
+	if err != nil {
+		return c.Send(err.Error())
+	}
+	return c.Send(formatTask(task))
 }

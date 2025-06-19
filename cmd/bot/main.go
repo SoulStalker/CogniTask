@@ -74,10 +74,13 @@ func main() {
 	b.Handle("/start", h.Start)
 	b.Handle("/help", h.Help)
 	b.Handle("/add", h.Add)
+	b.Handle(keyboards.BtnAdd, h.Add)
 	b.Handle("/pending", h.Pending)
-	b.Handle(tele.OnText, h.HandleText)
+	b.Handle(keyboards.BtnPending, h.Pending)
 	b.Handle(keyboards.BtnComplete, h.Complete)
 	b.Handle(keyboards.BtnCancel, h.Cancel)
+	b.Handle(tele.OnCallback, h.Cancel)
+	b.Handle(tele.OnText, h.HandleText)
 
 	// Graceful shutdown
 	go func() {

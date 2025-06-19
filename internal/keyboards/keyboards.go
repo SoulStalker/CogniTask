@@ -13,6 +13,10 @@ const (
 	BtnCalendar = "🗓️ Выбрать"
 	BtnSkipDate = "⏭️ Пропустить"
 	BtnCancel   = "🚫 Отмена"
+	BtnAdd      = "Новая задача"
+	BtnSettings = "Настройки"
+	BtnPending  = "Текущие"
+	BtnAll      = "Все"
 )
 
 // Глобальные кнопки для регистрации хендлеров
@@ -42,6 +46,28 @@ func GetDateSelectionKeyboard() *tele.ReplyMarkup {
 		kb.Row(btnToday, btnTomorrow),
 		kb.Row(btnCalendar),
 		kb.Row(btnSkip, BtnCancel),
+	)
+
+	return kb
+}
+
+// CreateMainKeyboard основная клавиатура
+func CreateMainKeyboard() *tele.ReplyMarkup {
+	kb := &tele.ReplyMarkup{
+		ResizeKeyboard:  true,
+		OneTimeKeyboard: true,
+	}
+
+	btnAdd := kb.Text(BtnAdd)
+	btnSettings := kb.Text(BtnSettings)
+	btnPending := kb.Text(BtnPending)
+	btnAll := kb.Text(BtnAll)
+	btnCancel := kb.Text(BtnCancel)
+
+	kb.Reply(
+		kb.Row(btnAdd, btnSettings),
+		kb.Row(btnPending, btnAll),
+		kb.Row(btnCancel),
 	)
 
 	return kb

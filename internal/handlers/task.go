@@ -27,25 +27,28 @@ func NewTaskHandler(fsm *fsm.FSMService, service *usecase.TaskService, ctx conte
 	}
 }
 
-// Start хендлер для обработки команды Start
-func (h *TaskHandler) Start(c tele.Context) error {
-	if err := h.fsmService.ClearState(h.ctx, c.Sender().ID); err != nil {
-		log.Printf("Failed to clear state: %v", err)
-	}
-	return c.Send(messages.BotMessages.Start)
-}
-
-// Help хендлер для обработки команды Help
-func (h *TaskHandler) Help(c tele.Context) error {
-	return c.Send(messages.BotMessages.Help)
-}
-
+// Pending вывод списка открытых задач
 func (h *TaskHandler) Pending(c tele.Context) error {
-	taskList, err := h.service.GetPending()
+	tasks, err := h.service.GetPending()
 	if err != nil {
 		return c.Send(err.Error())
 	}
-	return c.Send(formatTaskList(taskList))
+	if len(tasks) == 0 {
+		return c.Send("У вас нет открытых задач")
+	}
+
+	var rows [][]tele.InlineButton
+	for _, task := range tasks {
+		btn := 
+		tele.InlineButton{
+			Unique: "complete_task",
+			Text:   "✅ " + task.Description,
+			Data:   strconv.Itoa(int(task.ID)), // сюда попадёт в c.Callback().Data
+		}
+		rows = append(rows, []tele.InlineButton{btn})
+	}
+
+	return c.Send("Текущие задачи:", &tele.ReplyMarkup{InlineKeyboard: rows})
 }
 
 // Add  хендлер для обработки команды  Add
@@ -90,7 +93,7 @@ func (h *TaskHandler) HandleText(c tele.Context) error {
 
 }
 
-// TaskName в фсм состянии ждет название таска
+// processTaskText в фсм состянии ждет название таска
 func (h *TaskHandler) processTaskText(c tele.Context, state *fsm.FSMData) error {
 	userID := c.Sender().ID
 	state.TaskText = c.Text()
@@ -106,6 +109,7 @@ func (h *TaskHandler) processTaskText(c tele.Context, state *fsm.FSMData) error 
 	return c.Send(messages.BotMessages.InputNewDate, keyboards.GetDateSelectionKeyboard())
 }
 
+// processTaskDate в фсм состянии ждет дату таски
 func (h *TaskHandler) processTaskDate(c tele.Context, state *fsm.FSMData) error {
 	userID := c.Sender().ID
 	state.TaskDate = c.Text()
@@ -138,6 +142,7 @@ func (h *TaskHandler) processTaskDate(c tele.Context, state *fsm.FSMData) error 
 	return c.Send(formatTask(task))
 }
 
+// Complete закрытие задачи
 func (h *TaskHandler) Complete(c tele.Context) error {
 	strTaskID := c.Callback().Data
 	taskID, err := strconv.Atoi(strTaskID)

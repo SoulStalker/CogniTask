@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"strconv"
 
@@ -38,15 +37,7 @@ func (h *TaskHandler) Pending(c tele.Context) error {
 		return c.Send("У вас нет открытых задач")
 	}
 
-	var rows [][]tele.InlineButton
-	for _, task := range tasks {
-		btn := tele.InlineButton{
-            Unique: keyboards.BtnComplete.Unique,
-            Text:   "✅ " + task.Description, 
-            Data:   fmt.Sprint(task.ID), 
-        }
-		rows = append(rows, []tele.InlineButton{btn})
-	}
+	rows := formatTaskList(tasks)
 
 	return c.Send("Текущие задачи:", &tele.ReplyMarkup{InlineKeyboard: rows})
 }

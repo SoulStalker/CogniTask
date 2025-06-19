@@ -20,3 +20,12 @@ func (h *TaskHandler) Help(c tele.Context) error {
 	return c.Send(messages.BotMessages.Help)
 }
 
+func (h *TaskHandler) Cancel(c tele.Context) error {
+	userID := c.Sender().ID
+
+	err := h.fsmService.ClearState(h.ctx, userID)
+	if err != nil {
+		return c.Send(err.Error())
+	}
+	return c.Send(messages.BotMessages.Help)
+}

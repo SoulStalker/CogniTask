@@ -145,5 +145,5 @@ func (h *TaskHandler) Complete(c tele.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.Edit("Task completed")
+	return c.Edit("✅ Задача завершена")
 }

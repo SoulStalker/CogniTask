@@ -77,6 +77,7 @@ func main() {
 	b.Handle("/pending", h.Pending)
 	b.Handle(tele.OnText, h.HandleText)
 	b.Handle(keyboards.BtnComplete, h.Complete)
+	b.Handle(keyboards.BtnCancel, h.Cancel)
 
 	// Graceful shutdown
 	go func() {

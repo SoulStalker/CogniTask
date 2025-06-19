@@ -8,7 +8,7 @@ import (
 )
 
 type DBConfig struct {
-	DSN string
+	DSN    string
 	Logger logger.Interface
 }
 
@@ -17,6 +17,6 @@ func InitDB(config DBConfig) (*gorm.DB, error) {
 		Logger: config.Logger,
 	})
 
-	db.AutoMigrate(&domain.Task{})
+	db.AutoMigrate(&domain.Task{}, &domain.Media{})
 	return db, err
 }

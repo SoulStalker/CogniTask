@@ -10,7 +10,7 @@ import (
 )
 
 func formatTaskList(tasks []domain.Task) [][]tele.InlineButton {
- 	var rows [][]tele.InlineButton
+	var rows [][]tele.InlineButton
 
 	for _, task := range tasks {
 		btn := tele.InlineButton{
@@ -20,7 +20,7 @@ func formatTaskList(tasks []domain.Task) [][]tele.InlineButton {
 		}
 		rows = append(rows, []tele.InlineButton{btn})
 	}
-	cancelBtn := tele.InlineButton{Unique: "cancel", Text: keyboards.BtnCancel1.Unique}
+	cancelBtn := tele.InlineButton{Unique: "cancel", Text: keyboards.BtnCancel.Unique}
 	rows = append(rows, []tele.InlineButton{cancelBtn})
 
 	return rows

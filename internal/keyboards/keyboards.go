@@ -12,11 +12,8 @@ const (
 	BtnTomorrow = "🌅 Завтра"
 	BtnCalendar = "🗓️ Выбрать"
 	BtnSkipDate = "⏭️ Пропустить"
-	BtnCancel   = "🚫 Отмена"
-	BtnAdd      = "Новая задача"
-	BtnSettings = "Настройки"
-	BtnPending  = "Текущие"
-	BtnAll      = "Все"
+	// BtnCancel   = "🚫 Отмена"
+
 )
 
 // Глобальные кнопки для регистрации хендлеров
@@ -25,7 +22,11 @@ var (
 	BtnDelete    = &tele.InlineButton{Unique: "delete_task", Text: "🗑 Удалить"}
 	BtnEditDate  = &tele.InlineButton{Unique: "edit_date", Text: "📅 Изменить дату"}
 	BtnRandomPic = &tele.InlineButton{Unique: "random_pic", Text: "🎲 Random Pic"}
-	BtnCancel1   = &tele.InlineButton{Unique: "cancel", Text: "🚫 Отмена"}
+	BtnCancel    = &tele.InlineButton{Unique: "cancel", Text: "🚫 Отмена"}
+	BtnAdd       = &tele.InlineButton{Unique: "add", Text: "Новая задача"}
+	BtnSettings  = &tele.InlineButton{Unique: "settings", Text: "Настройки"}
+	BtnPending   = &tele.InlineButton{Unique: "pending", Text: "Текущие"}
+	BtnAll       = &tele.InlineButton{Unique: "all_tasks", Text: "Все"}
 )
 
 // GetDateSelectionKeyboard клавиатура для выбора даты задачи
@@ -40,13 +41,13 @@ func GetDateSelectionKeyboard() *tele.ReplyMarkup {
 	btnTomorrow := kb.Text(BtnTomorrow)
 	btnCalendar := kb.Text(BtnCalendar)
 	btnSkip := kb.Text(BtnSkipDate)
-	BtnCancel := kb.Text(BtnCancel)
+	// BtnCancel := kb.Text(BtnCancel)
 
 	// Раскладка кнопок три ряда: Сегодня | Завтра, Выбрать, Пропустить | Отмена
 	kb.Reply(
 		kb.Row(btnToday, btnTomorrow),
 		kb.Row(btnCalendar),
-		kb.Row(btnSkip, BtnCancel),
+		kb.Row(btnSkip),
 	)
 
 	return kb
@@ -55,17 +56,17 @@ func GetDateSelectionKeyboard() *tele.ReplyMarkup {
 // CreateMainKeyboard основная клавиатура
 func CreateMainKeyboard() *tele.ReplyMarkup {
 	kb := &tele.ReplyMarkup{
-		ResizeKeyboard:  true,
-		OneTimeKeyboard: true,
+		// ResizeKeyboard:  true,
+		// OneTimeKeyboard: true,
 	}
 
-	btnAdd := kb.Text(BtnAdd)
-	btnSettings := kb.Text(BtnSettings)
-	btnPending := kb.Text(BtnPending)
-	btnAll := kb.Text(BtnAll)
-	btnCancel := kb.Text(BtnCancel)
+	btnAdd := kb.Data(BtnAdd.Text, BtnAdd.Unique)
+	btnSettings := kb.Data(BtnSettings.Text, BtnSettings.Unique)
+	btnPending := kb.Data(BtnPending.Text, BtnPending.Unique)
+	btnAll := kb.Data(BtnAll.Text, BtnAll.Unique)
+	btnCancel := kb.Data(BtnCancel.Text, BtnCancel.Unique)
 
-	kb.Reply(
+	kb.Inline(
 		kb.Row(btnAdd, btnSettings),
 		kb.Row(btnPending, btnAll),
 		kb.Row(btnCancel),

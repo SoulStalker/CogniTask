@@ -25,6 +25,7 @@ var (
 	BtnDelete    = &tele.InlineButton{Unique: "delete_task", Text: "🗑 Удалить"}
 	BtnEditDate  = &tele.InlineButton{Unique: "edit_date", Text: "📅 Изменить дату"}
 	BtnRandomPic = &tele.InlineButton{Unique: "random_pic", Text: "🎲 Random Pic"}
+	BtnCancel1   = &tele.InlineButton{Unique: "cancel", Text: "🚫 Отмена"}
 )
 
 // GetDateSelectionKeyboard клавиатура для выбора даты задачи

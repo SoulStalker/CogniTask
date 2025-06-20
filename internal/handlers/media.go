@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"context"
-	"fmt"
 
+	"github.com/SoulStalker/cognitask/internal/domain"
 	"github.com/SoulStalker/cognitask/internal/usecase"
 	tele "gopkg.in/telebot.v3"
 )
@@ -22,12 +22,20 @@ func NewMediaHandler(service *usecase.MediaService, ctx context.Context) *MediaH
 
 func (h *MediaHandler) Create(c tele.Context) error {
 	link := c.Message().Media().MediaFile().FileID
-	fmt.Println(link)
+	err := h.service.Create(domain.Media{Link: link})
+	if err != nil {
+		c.Send(err.Error())
+	}
 	return c.Send(link)
 }
 
 func (h *MediaHandler) Delete(c tele.Context) error {
-	return c.Send("Not implemented")
+	link := c.Message().Media().MediaFile().FileID
+	err := h.service.Delete(domain.Media{Link: link})
+	if err != nil {
+		return c.Send(err.Error())
+	}
+	return c.Send("Deleted")
 }
 
 func (h *MediaHandler) GetByLink(c tele.Context) error {
@@ -35,5 +43,10 @@ func (h *MediaHandler) GetByLink(c tele.Context) error {
 }
 
 func (h *MediaHandler) Random(c tele.Context) error {
-	return c.Send("Not implemented")
+	media, err := h.service.Random()
+	if err != nil {
+		return c.Send(err.Error())
+	}
+	photo := &tele.Photo{File: tele.File{FileID: media.Link}}
+	return c.Send(photo)
 }

@@ -2,7 +2,7 @@ package domain
 
 type Media struct {
 	ID   uint   `gorm:"primaryKey" json:"id"`
-	Link string `gorm:"size:500, unique" json:"link"`
+	Link string `gorm:"size:500,unique" json:"link"`
 }
 
 type MediaRepository interface {

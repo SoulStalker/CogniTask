@@ -82,10 +82,11 @@ func main() {
 	b.Handle(keyboards.BtnPending, h.Pending)
 	b.Handle(keyboards.BtnComplete, h.Complete)
 	b.Handle(keyboards.BtnCancel, h.Cancel)
-	b.Handle(tele.OnCallback, h.Cancel)
+	b.Handle(tele.OnCallback, mh.Random)
 	b.Handle(tele.OnText, h.HandleText)
 
 	b.Handle(tele.OnMedia, mh.Create)
+	// b.Handle(keyboards.BtnRandomPic.Text, )
 
 	// Graceful shutdown
 	go func() {

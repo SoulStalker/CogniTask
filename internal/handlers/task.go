@@ -49,6 +49,11 @@ func (h *TaskHandler) Pending(c tele.Context) error {
 
 // Add  хендлер для обработки команды  Add
 func (h *TaskHandler) Add(c tele.Context) error {
+	err := c.Respond()
+	if err != nil {
+		return c.Edit(err.Error())
+	}
+
 	userID := c.Sender().ID
 
 	if err := h.fsmService.ClearState(h.ctx, c.Sender().ID); err != nil {
@@ -61,9 +66,9 @@ func (h *TaskHandler) Add(c tele.Context) error {
 
 	if err := h.fsmService.SetState(h.ctx, userID, state); err != nil {
 		log.Printf("Failed to set state: %v", err)
-		c.Send(messages.BotMessages.ErrorSomeError)
+		c.Edit(messages.BotMessages.ErrorSomeError)
 	}
-	return c.Send(messages.BotMessages.InputTaskText)
+	return c.Edit(messages.BotMessages.InputTaskText, keyboards.CreateCancelKeyboard())
 }
 
 // processTaskText в фсм состянии ждет название таска
@@ -88,7 +93,7 @@ func (h *TaskHandler) processTaskDate(c tele.Context, state *fsm.FSMData) error 
 
 	err := h.createTask(c, state)
 	if err != nil {
-		return c.Send(err.Error())
+		return c.Edit(err.Error())
 	}
 
 	return nil
@@ -99,14 +104,13 @@ func (h *TaskHandler) processTaskDate(c tele.Context, state *fsm.FSMData) error 
 func (h *TaskHandler) Complete(c tele.Context) error {
 	err := c.Respond()
 	if err != nil {
-		return err
+		return c.Edit(err.Error())
 	}
 
 	strTaskID := c.Callback().Data
 	taskID, err := strconv.Atoi(strTaskID)
-	log.Printf("Task ID: %d", taskID)
 	if err != nil {
-		return c.Send(err.Error())
+		return c.Edit(err.Error())
 	}
 	_, err = h.service.MarkDone(uint(taskID))
 	if err != nil {
@@ -116,10 +120,15 @@ func (h *TaskHandler) Complete(c tele.Context) error {
 }
 
 func (h *TaskHandler) createTask(c tele.Context, state *fsm.FSMData) error {
+	err := c.Respond()
+	if err != nil {
+		return c.Edit(err.Error())
+	}
+
 	taskDescription := state.TaskText
 	taskDeadline, err := keyboards.ParseDate(state.TaskDate)
 	if err != nil {
-		return c.Send(err.Error())
+		return c.Edit(err.Error())
 	}
 
 	task, err := h.service.Add(domain.Task{
@@ -127,12 +136,12 @@ func (h *TaskHandler) createTask(c tele.Context, state *fsm.FSMData) error {
 		Deadline:    taskDeadline,
 	})
 	if err != nil {
-		return c.Send(err.Error())
+		return c.Edit(err.Error())
 	}
 	err = h.fsmService.ClearState(h.ctx, c.Sender().ID)
 
 	if err != nil {
-		return c.Send(err.Error())
+		return c.Edit(err.Error())
 	}
-	return c.Send(formatTask(task))
+	return c.Edit(formatTask(task), keyboards.CreateMainKeyboard())
 }

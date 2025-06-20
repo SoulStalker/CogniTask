@@ -18,7 +18,7 @@ func (h *TaskHandler) Start(c tele.Context) error {
 
 // Help хендлер для обработки команды Help
 func (h *TaskHandler) Help(c tele.Context) error {
-	return c.Send(messages.BotMessages.Help)
+	return c.Send(messages.BotMessages.Help, keyboards.CreateMainKeyboard())
 }
 
 func (h *TaskHandler) Cancel(c tele.Context) error {

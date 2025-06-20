@@ -6,16 +6,6 @@ import (
 	tele "gopkg.in/telebot.v3"
 )
 
-const (
-	// Кнопки выбора даты
-	BtnToday    = "📅 Сегодня"
-	BtnTomorrow = "🌅 Завтра"
-	BtnCalendar = "🗓️ Выбрать"
-	BtnSkipDate = "⏭️ Пропустить"
-	// BtnCancel   = "🚫 Отмена"
-
-)
-
 // Глобальные кнопки для регистрации хендлеров
 var (
 	BtnComplete  = &tele.InlineButton{Unique: "complete_task", Text: "✅ Выполнить"}
@@ -27,27 +17,28 @@ var (
 	BtnPending   = &tele.InlineButton{Unique: "pending", Text: "Текущие задачи"}
 	BtnAll       = &tele.InlineButton{Unique: "all_tasks", Text: "Все задачи"}
 	BtnRandomPic = &tele.InlineButton{Unique: "random_pic", Text: "🎲 Random Pic"}
+	BtnToday     = &tele.InlineButton{Unique: "today", Text: "📅 Сегодня"}
+	BtnTomorrow  = &tele.InlineButton{Unique: "tomorrow", Text: "🌅 Завтра"}
+	BtnCalendar  = &tele.InlineButton{Unique: "choose", Text: "🗓️ Выбрать"}
+	BtnSkipDate  = &tele.InlineButton{Unique: "skip", Text: "⏭️ Пропустить"}
 )
 
 // GetDateSelectionKeyboard клавиатура для выбора даты задачи
 func GetDateSelectionKeyboard() *tele.ReplyMarkup {
-	kb := &tele.ReplyMarkup{
-		ResizeKeyboard:  true,
-		OneTimeKeyboard: true,
-	}
+	kb := &tele.ReplyMarkup{}
 
 	// Кнопки
-	btnToday := kb.Text(BtnToday)
-	btnTomorrow := kb.Text(BtnTomorrow)
-	btnCalendar := kb.Text(BtnCalendar)
-	btnSkip := kb.Text(BtnSkipDate)
-	// BtnCancel := kb.Text(BtnCancel)
+	btnToday := kb.Data(BtnToday.Text, BtnToday.Unique)
+	btnTomorrow := kb.Data(BtnTomorrow.Text, BtnTomorrow.Unique)
+	btnCalendar := kb.Data(BtnCalendar.Text, BtnCalendar.Unique)
+	btnSkip := kb.Data(BtnSkipDate.Text, BtnSkipDate.Unique)
+	btnCancel := kb.Data(BtnCancel.Text, BtnCancel.Unique)
 
 	// Раскладка кнопок три ряда: Сегодня | Завтра, Выбрать, Пропустить | Отмена
-	kb.Reply(
+	kb.Inline(
 		kb.Row(btnToday, btnTomorrow),
-		kb.Row(btnCalendar),
-		kb.Row(btnSkip),
+		kb.Row(btnCalendar, btnSkip),
+		kb.Row(btnCancel),
 	)
 
 	return kb
@@ -109,4 +100,13 @@ func CreateSettingsKeyboard() *tele.ReplyMarkup {
 	)
 
 	return markup
+}
+
+// CreateMainKeyboard основная клавиатура
+func CreateCancelKeyboard() *tele.ReplyMarkup {
+	kb := &tele.ReplyMarkup{}
+	btnCancel := kb.Data(BtnCancel.Text, BtnCancel.Unique)
+	kb.Inline(kb.Row(btnCancel))
+
+	return kb
 }

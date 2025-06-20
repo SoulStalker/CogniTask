@@ -9,11 +9,11 @@ import (
 // Парсинг даты из строки
 func ParseDate(dateStr string) (time.Time, error) {
 	switch dateStr {
-	case BtnToday:
+	case BtnToday.Unique:
 		dateStr = GetTodayDate()
-	case BtnTomorrow:
+	case BtnTomorrow.Unique:
 		dateStr = GetTomorrowDate()
-	case BtnSkipDate:
+	case BtnSkipDate.Unique:
 		return time.Time{}, nil
 	}
 

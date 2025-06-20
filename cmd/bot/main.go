@@ -74,19 +74,28 @@ func main() {
 		return
 	}
 	b.Use(middleware.AuthMiddleware(cfg.ChatId))
+
+	// commands
 	b.Handle("/start", h.Start)
 	b.Handle("/help", h.Help)
 	b.Handle("/add", h.Add)
-	b.Handle(keyboards.BtnAdd, h.Add)
 	b.Handle("/pending", h.Pending)
-	b.Handle(keyboards.BtnPending, h.Pending)
-	b.Handle(keyboards.BtnComplete, h.Complete)
-	b.Handle(keyboards.BtnCancel, h.Cancel)
-	b.Handle(tele.OnCallback, mh.Random)
+
+	// tasks
 	b.Handle(tele.OnText, h.HandleText)
 
+	b.Handle(keyboards.BtnAdd, h.Add)
+	b.Handle(keyboards.BtnPending, h.Pending)
+	b.Handle(keyboards.BtnComplete, h.Complete)
+
+	// media
 	b.Handle(tele.OnMedia, mh.Create)
-	// b.Handle(keyboards.BtnRandomPic.Text, )
+	b.Handle(keyboards.BtnRandomPic, mh.Random)
+
+	// other
+	b.Handle(tele.OnCallback, h.HandCallback)
+	b.Handle(keyboards.BtnCancel, h.Cancel)
+
 
 	// Graceful shutdown
 	go func() {

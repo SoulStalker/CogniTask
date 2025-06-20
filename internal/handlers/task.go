@@ -29,6 +29,11 @@ func NewTaskHandler(fsm *fsm.FSMService, service *usecase.TaskService, ctx conte
 
 // Pending вывод списка открытых задач
 func (h *TaskHandler) Pending(c tele.Context) error {
+	err := c.Respond()
+	if err != nil {
+		return err
+	}
+
 	tasks, err := h.service.GetPending()
 	if err != nil {
 		return c.Send(err.Error())
@@ -39,7 +44,7 @@ func (h *TaskHandler) Pending(c tele.Context) error {
 
 	rows := formatTaskList(tasks)
 
-	return c.Send("Текущие задачи:", &tele.ReplyMarkup{InlineKeyboard: rows})
+	return c.Edit("Текущие задачи:", &tele.ReplyMarkup{InlineKeyboard: rows})
 }
 
 // Add  хендлер для обработки команды  Add
@@ -92,6 +97,11 @@ func (h *TaskHandler) processTaskDate(c tele.Context, state *fsm.FSMData) error 
 
 // Complete закрытие задачи
 func (h *TaskHandler) Complete(c tele.Context) error {
+	err := c.Respond()
+	if err != nil {
+		return err
+	}
+
 	strTaskID := c.Callback().Data
 	taskID, err := strconv.Atoi(strTaskID)
 	log.Printf("Task ID: %d", taskID)
@@ -102,7 +112,7 @@ func (h *TaskHandler) Complete(c tele.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.Edit("✅ Задача завершена")
+	return c.Edit("✅ Задача завершена", keyboards.CreateMainKeyboard())
 }
 
 func (h *TaskHandler) createTask(c tele.Context, state *fsm.FSMData) error {

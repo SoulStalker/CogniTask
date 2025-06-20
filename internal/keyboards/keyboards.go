@@ -21,12 +21,12 @@ var (
 	BtnComplete  = &tele.InlineButton{Unique: "complete_task", Text: "✅ Выполнить"}
 	BtnDelete    = &tele.InlineButton{Unique: "delete_task", Text: "🗑 Удалить"}
 	BtnEditDate  = &tele.InlineButton{Unique: "edit_date", Text: "📅 Изменить дату"}
-	BtnRandomPic = &tele.InlineButton{Unique: "random_pic", Text: "🎲 Random Pic"}
 	BtnCancel    = &tele.InlineButton{Unique: "cancel", Text: "🚫 Отмена"}
 	BtnAdd       = &tele.InlineButton{Unique: "add", Text: "Новая задача"}
 	BtnSettings  = &tele.InlineButton{Unique: "settings", Text: "Настройки"}
-	BtnPending   = &tele.InlineButton{Unique: "pending", Text: "Текущие"}
-	BtnAll       = &tele.InlineButton{Unique: "all_tasks", Text: "Все"}
+	BtnPending   = &tele.InlineButton{Unique: "pending", Text: "Текущие задачи"}
+	BtnAll       = &tele.InlineButton{Unique: "all_tasks", Text: "Все задачи"}
+	BtnRandomPic = &tele.InlineButton{Unique: "random_pic", Text: "🎲 Random Pic"}
 )
 
 // GetDateSelectionKeyboard клавиатура для выбора даты задачи

@@ -22,11 +22,16 @@ func (h *TaskHandler) Help(c tele.Context) error {
 }
 
 func (h *TaskHandler) Cancel(c tele.Context) error {
+	err := c.Respond()
+	if err != nil {
+		return err
+	}
+
 	userID := c.Sender().ID
 
-	err := h.fsmService.ClearState(h.ctx, userID)
+	err = h.fsmService.ClearState(h.ctx, userID)
 	if err != nil {
-		return c.Send(err.Error())
+		return c.Edit(err.Error())
 	}
-	return c.Send(messages.BotMessages.ChooseAction, keyboards.CreateMainKeyboard())
+	return c.Edit(messages.BotMessages.ChooseAction, keyboards.CreateMainKeyboard())
 }

@@ -8,6 +8,9 @@ import (
 // todo надо подумать может лучше просто принимать цифру текущего месяца
 // Парсинг даты из строки
 func ParseDate(dateStr string) (time.Time, error) {
+
+	fmt.Printf("parsing date: %s", dateStr)
+	
 	switch dateStr {
 	case BtnToday.Unique:
 		dateStr = GetTodayDate()

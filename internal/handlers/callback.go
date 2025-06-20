@@ -8,10 +8,7 @@ import (
 	tele "gopkg.in/telebot.v3"
 )
 
-// HandleText - это единый обработчик для всех текстовых сообщений.
-// Он работает как маршрутизатор на основе состояния FSM.
-// Оказывается telebot не умеет пропускать сообщения без обработки :(
-func (h *TaskHandler) HandleText(c tele.Context) error {
+func (h *TaskHandler) HandCallback(c tele.Context) error {
 	userID := c.Sender().ID
 
 	state, err := h.fsmService.GetState(h.ctx, userID)
@@ -26,7 +23,7 @@ func (h *TaskHandler) HandleText(c tele.Context) error {
 	case fsm.StateWaitingTaskDate:
 		return h.processTaskDate(c, state)
 	default:
-		return c.Send("Unknown text: ", c.Text())
+		return nil
 	}
 
 }

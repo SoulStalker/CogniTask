@@ -2,8 +2,10 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"strconv"
+	"strings"
 
 	"github.com/SoulStalker/cognitask/internal/domain"
 	"github.com/SoulStalker/cognitask/internal/fsm"
@@ -89,7 +91,8 @@ func (h *TaskHandler) processTaskText(c tele.Context, state *fsm.FSMData) error 
 
 // processTaskDate в фсм состянии ждет дату таски
 func (h *TaskHandler) processTaskDate(c tele.Context, state *fsm.FSMData) error {
-	state.TaskDate = c.Text()
+	state.TaskDate = strings.Trim(c.Callback().Data, " ")
+	fmt.Printf("Got callback: %v, task date %s", c.Callback().Data, state.TaskDate)
 
 	err := h.createTask(c, state)
 	if err != nil {
@@ -120,10 +123,6 @@ func (h *TaskHandler) Complete(c tele.Context) error {
 }
 
 func (h *TaskHandler) createTask(c tele.Context, state *fsm.FSMData) error {
-	err := c.Respond()
-	if err != nil {
-		return c.Edit(err.Error())
-	}
 
 	taskDescription := state.TaskText
 	taskDeadline, err := keyboards.ParseDate(state.TaskDate)

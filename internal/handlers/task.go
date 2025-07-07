@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"strconv"
 	"strings"
@@ -73,7 +72,7 @@ func (h *TaskHandler) Add(c tele.Context) error {
 	return c.Edit(messages.BotMessages.InputTaskText, keyboards.CreateCancelKeyboard())
 }
 
-// processTaskText в фсм состянии ждет название таска
+// processTaskText в фсм состоянии ждет название таска
 func (h *TaskHandler) processTaskText(c tele.Context, state *fsm.FSMData) error {
 	userID := c.Sender().ID
 	state.TaskText = c.Text()
@@ -91,8 +90,10 @@ func (h *TaskHandler) processTaskText(c tele.Context, state *fsm.FSMData) error 
 
 // processTaskDate в фсм состянии ждет дату таски
 func (h *TaskHandler) processTaskDate(c tele.Context, state *fsm.FSMData) error {
-	state.TaskDate = strings.Trim(c.Callback().Data, " ")
-	fmt.Printf("Got callback: %v, task date %s", c.Callback().Data, state.TaskDate)
+	// получаю callback данные и убираю лишние символы
+	rawDate := c.Callback().Data
+	cleanDate := strings.Join(strings.Fields(rawDate), " ")
+	state.TaskDate = cleanDate
 
 	err := h.createTask(c, state)
 	if err != nil {

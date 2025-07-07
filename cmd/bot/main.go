@@ -3,12 +3,14 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/SoulStalker/cognitask/internal/keyboards"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/SoulStalker/cognitask/internal/keyboards"
+	"github.com/SoulStalker/cognitask/internal/messages"
 
 	tele "gopkg.in/telebot.v3"
 
@@ -73,6 +75,9 @@ func main() {
 	if err != nil {
 		return
 	}
+	if err = b.SetCommands(messages.Commands); err != nil {
+		log.Fatalf("Не удалось установить команды: %v", err)
+	}
 	b.Use(middleware.AuthMiddleware(cfg.ChatId))
 
 	// commands
@@ -95,7 +100,6 @@ func main() {
 	// other
 	b.Handle(tele.OnCallback, h.HandCallback)
 	b.Handle(keyboards.BtnCancel, h.Cancel)
-
 
 	// Graceful shutdown
 	go func() {

@@ -1,5 +1,12 @@
 package messages
 
+import tele "gopkg.in/telebot.v3"
+
+var Commands = []tele.Command{
+	{Text: "start", Description: "Запустить бота"},
+	{Text: "help", Description: "Помощь"},
+}
+
 type Messages struct {
 	// Commands
 	Start string
@@ -20,7 +27,7 @@ type Messages struct {
 
 var BotMessages = Messages{
 	Start: "Привет! Я твой таск-менеджер\nБуду сохранять твои задачи и напоминать о них иногда\nБольше информации по команде /help",
-	Help:  "Доступные команды:\n/start - запуск бота\n/settings - настройка бота\n/add - добавить задачу\n/pending - список не выполненных задач",
+	Help:  "Доступные команды:\n/start - запуск бота\n/settings - настройка бота\n",
 
 	Add:  "Добавить задачу",
 	List: "Список задач",

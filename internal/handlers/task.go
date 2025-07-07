@@ -41,7 +41,7 @@ func (h *TaskHandler) Pending(c tele.Context) error {
 		return c.Send(err.Error())
 	}
 	if len(tasks) == 0 {
-		return c.Send("У вас нет открытых задач")
+		return c.Edit("У вас нет открытых задач", keyboards.CreateMainKeyboard())
 	}
 
 	rows := formatTaskList(tasks)

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"strconv"
 	"strings"
@@ -88,13 +89,22 @@ func (h *TaskHandler) processTaskText(c tele.Context, state *fsm.FSMData) error 
 	return c.Send(messages.BotMessages.InputNewDate, keyboards.GetDateSelectionKeyboard())
 }
 
-// processTaskDate в фсм состянии ждет дату таски
+// processTaskDate в фсм состоянии ждет дату таски
 func (h *TaskHandler) processTaskDate(c tele.Context, state *fsm.FSMData) error {
-	// получаю callback данные и убираю лишние символы
-	rawDate := c.Callback().Data
-	cleanDate := strings.Join(strings.Fields(rawDate), " ")
-	state.TaskDate = cleanDate
-
+	if c.Callback() == nil {
+		getDate := c.Text()
+		_, err := keyboards.ParseDate(getDate)
+		if err != nil {
+			return c.Send(err.Error())
+		}
+		state.TaskDate = getDate
+	} else {
+		// получаю callback данные и убираю лишние символы
+		rawDate := c.Callback().Data
+		cleanDate := strings.Join(strings.Fields(rawDate), " ")
+		state.TaskDate = cleanDate
+	}
+	fmt.Println("Мы тут", state)
 	err := h.createTask(c, state)
 	if err != nil {
 		return c.Edit(err.Error())
@@ -124,11 +134,10 @@ func (h *TaskHandler) Complete(c tele.Context) error {
 }
 
 func (h *TaskHandler) createTask(c tele.Context, state *fsm.FSMData) error {
-
 	taskDescription := state.TaskText
 	taskDeadline, err := keyboards.ParseDate(state.TaskDate)
 	if err != nil {
-		return c.Edit(err.Error())
+		return c.Send(err.Error())
 	}
 
 	task, err := h.service.Add(domain.Task{
@@ -136,12 +145,12 @@ func (h *TaskHandler) createTask(c tele.Context, state *fsm.FSMData) error {
 		Deadline:    taskDeadline,
 	})
 	if err != nil {
-		return c.Edit(err.Error())
+		return c.Send(err.Error())
 	}
 	err = h.fsmService.ClearState(h.ctx, c.Sender().ID)
 
 	if err != nil {
-		return c.Edit(err.Error())
+		return c.Send(err.Error())
 	}
-	return c.Edit(formatTask(task), keyboards.CreateMainKeyboard())
+	return c.Send(formatTask(task), keyboards.CreateMainKeyboard())
 }

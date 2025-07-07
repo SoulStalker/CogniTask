@@ -27,7 +27,7 @@ func (r *GormTaskRepo) Add(task domain.Task) (domain.Task, error) {
 
 func (r *GormTaskRepo) MarkDone(id uint) (bool, error) {
 	err := r.DB.Model(&domain.Task{}).Where("id=?", id).Updates(domain.Task{
-		Closed: true,
+		Closed:   true,
 		ClosedAt: time.Now(),
 	}).Error
 	if err != nil {
@@ -85,4 +85,13 @@ func (r *GormTaskRepo) GetByID(id uint) (domain.Task, error) {
 		return domain.Task{}, err
 	}
 	return task, nil
+}
+
+func (r *GormMediaRepo) All() ([]domain.Task, error) {
+	var tasks []domain.Task
+	err := r.DB.Find(&tasks).Error
+	if err != nil {
+		return []domain.Task{}, err
+	}
+	return tasks, nil
 }

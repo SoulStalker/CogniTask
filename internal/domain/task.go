@@ -20,4 +20,5 @@ type TaskRepository interface {
 	GetExpired(deadline time.Time) ([]Task, error)
 	DeleteOldDone(N_days int) (int64, error)
 	GetByID(id uint) (Task, error)
+	All() ([]Task, error)
 }

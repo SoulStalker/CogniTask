@@ -5,6 +5,7 @@ import tele "gopkg.in/telebot.v3"
 var Commands = []tele.Command{
 	{Text: "start", Description: "Запустить бота"},
 	{Text: "help", Description: "Помощь"},
+	{Text: "random", Description: "Случайная мотивация"},
 }
 
 type Messages struct {

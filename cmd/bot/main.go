@@ -83,8 +83,7 @@ func main() {
 	// commands
 	b.Handle("/start", h.Start)
 	b.Handle("/help", h.Help)
-	b.Handle("/add", h.Add)
-	b.Handle("/pending", h.Pending)
+	b.Handle("/random", mh.Random)
 
 	// tasks
 	b.Handle(tele.OnText, h.HandleText)
@@ -95,7 +94,7 @@ func main() {
 
 	// media
 	b.Handle(tele.OnMedia, mh.Create)
-	b.Handle(keyboards.BtnRandomPic, mh.Random)
+	// b.Handle(keyboards.BtnRandomPic, mh.Random)
 
 	// other
 	b.Handle(tele.OnCallback, h.HandCallback)

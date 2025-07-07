@@ -49,6 +49,26 @@ func (h *TaskHandler) Pending(c tele.Context) error {
 	return c.Edit("Текущие задачи:", &tele.ReplyMarkup{InlineKeyboard: rows})
 }
 
+// All выводит список всех задач
+func (h *TaskHandler) All(c tele.Context) error {
+	err := c.Respond()
+	if err != nil {
+		return err
+	}
+
+	tasks, err := h.service.All()
+	if err != nil {
+		return c.Send(err.Error())
+	}
+	if len(tasks) == 0 {
+		return c.Edit("У вас нет задач", keyboards.CreateMainKeyboard())
+	}
+
+	rows := formatTaskList(tasks)
+
+	return c.Edit("Ваши задачи:", &tele.ReplyMarkup{InlineKeyboard: rows})
+}
+
 // Add  хендлер для обработки команды  Add
 func (h *TaskHandler) Add(c tele.Context) error {
 	err := c.Respond()

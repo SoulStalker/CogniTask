@@ -28,6 +28,10 @@ func (s *TaskService) GetPending() ([]domain.Task, error) {
 	return s.repo.GetPending()
 }
 
+func (s *TaskService) All() ([]domain.Task, error) {
+	return s.repo.All()
+}
+
 func (s *TaskService) EditDate(id uint, newDate time.Time) (domain.Task, error) {
 	return s.repo.EditDate(id, newDate)
 }

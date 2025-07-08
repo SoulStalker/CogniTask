@@ -15,8 +15,13 @@ func formatTaskList(tasks []domain.Task) [][]tele.InlineButton {
 	for _, task := range tasks {
 		btn := tele.InlineButton{
 			Unique: keyboards.BtnComplete.Unique,
-			Text:   fmt.Sprintf("✅ %s : %s", task.Description, task.Deadline.Format("02-01")),
-			Data:   fmt.Sprint(task.ID),
+			Data: fmt.Sprint(task.ID),
+		}
+		if !task.Closed {
+			btn.Text = fmt.Sprintf("✅ %s : %s", task.Description, task.Deadline.Format("02-01"))
+		} else {
+			btn.Unique = keyboards.BtnDelete.Unique
+			btn.Text = fmt.Sprintf("❌ %s : %s", task.Description, task.ClosedAt.Format("02-01"))
 		}
 		rows = append(rows, []tele.InlineButton{btn})
 	}

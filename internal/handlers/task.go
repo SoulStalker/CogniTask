@@ -104,8 +104,6 @@ func (h *TaskHandler) processTaskText(c tele.Context, state *fsm.FSMData) error 
 		log.Printf("Failed to update state: %v", err)
 		return c.Send(messages.BotMessages.ErrorTryAgain)
 	}
-
-	log.Printf("Task text saved: %s, moved to state: %s", state.TaskText, state.State)
 	return c.Send(messages.BotMessages.InputNewDate, keyboards.GetDateSelectionKeyboard())
 }
 
@@ -124,7 +122,6 @@ func (h *TaskHandler) processTaskDate(c tele.Context, state *fsm.FSMData) error 
 		cleanDate := strings.Join(strings.Fields(rawDate), " ")
 		state.TaskDate = cleanDate
 	}
-	fmt.Println("Мы тут", state)
 	err := h.createTask(c, state)
 	if err != nil {
 		return c.Edit(err.Error())
@@ -142,6 +139,7 @@ func (h *TaskHandler) Complete(c tele.Context) error {
 	}
 
 	strTaskID := c.Callback().Data
+
 	taskID, err := strconv.Atoi(strTaskID)
 	if err != nil {
 		return c.Edit(err.Error())
@@ -151,6 +149,27 @@ func (h *TaskHandler) Complete(c tele.Context) error {
 		return err
 	}
 	return c.Edit("✅ Задача завершена", keyboards.CreateMainKeyboard())
+}
+
+// Delete удаление задачи
+func (h *TaskHandler) Delete(c tele.Context) error {
+	err := c.Respond()
+	if err != nil {
+		return c.Edit(err.Error())
+	}
+
+	strTaskID := c.Callback().Data
+
+	taskID, err := strconv.Atoi(strTaskID)
+	if err != nil {
+		return c.Edit(err.Error())
+	}
+	err = h.service.Delete(uint(taskID))
+	if err != nil {
+		return err
+	}
+
+	return c.Edit("❌ Задача удалена", keyboards.CreateMainKeyboard())
 }
 
 func (h *TaskHandler) createTask(c tele.Context, state *fsm.FSMData) error {

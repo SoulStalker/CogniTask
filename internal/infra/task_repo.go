@@ -87,7 +87,7 @@ func (r *GormTaskRepo) GetByID(id uint) (domain.Task, error) {
 	return task, nil
 }
 
-func (r *GormMediaRepo) All() ([]domain.Task, error) {
+func (r *GormTaskRepo) All() ([]domain.Task, error) {
 	var tasks []domain.Task
 	err := r.DB.Find(&tasks).Error
 	if err != nil {

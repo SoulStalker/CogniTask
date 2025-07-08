@@ -42,9 +42,21 @@ func (r *GormMediaRepo) Delete(media domain.Media) error {
 
 func (r *GormMediaRepo) Random() (domain.Media, error) {
 	var media domain.Media
-	err := r.DB.Order("random()").First(&media).Error
+	err := r.DB.Where("Sent=?", false).Order("random()").First(&media).Error
 	if err != nil {
-		return domain.Media{}, nil
+		return domain.Media{}, err
+	}
+	media.Sent = true
+	if err := r.DB.Save(&media).Error; err != nil {
+		return domain.Media{}, err
 	}
 	return media, nil
+}
+
+func (r *GormMediaRepo) ClearStatus() error {
+	err := r.DB.Model(&domain.Media{}).Where("sent = ?", true).Update("sent", false).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }

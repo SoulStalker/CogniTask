@@ -1,6 +1,11 @@
 package usecase
 
-import "github.com/SoulStalker/cognitask/internal/domain"
+import (
+	"errors"
+
+	"github.com/SoulStalker/cognitask/internal/domain"
+	"gorm.io/gorm"
+)
 
 type MediaService struct {
 	repo domain.MediaRepository
@@ -25,5 +30,15 @@ func (s *MediaService) GetByLink(link string) (domain.Media, error) {
 }
 
 func (s *MediaService) Random() (domain.Media, error) {
-	return s.repo.Random()
+	media, err := s.repo.Random()
+
+	// если все отправлено, сбрасываем статусы и начинаем заново
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		err = s.repo.ClearStatus()
+		if err != nil {
+			return domain.Media{}, err
+		}
+		return s.repo.Random()
+	}
+	return media, nil
 }

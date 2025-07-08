@@ -22,11 +22,12 @@ func NewMediaHandler(service *usecase.MediaService, ctx context.Context) *MediaH
 
 func (h *MediaHandler) Create(c tele.Context) error {
 	link := c.Message().Media().MediaFile().FileID
-	err := h.service.Create(domain.Media{Link: link})
+	fileType := c.Message().Media().MediaType()
+	err := h.service.Create(domain.Media{Link: link, Type: fileType})
 	if err != nil {
 		c.Send(err.Error())
 	}
-	return c.Send(link)
+	return c.Send("Файл сохранен")
 }
 
 func (h *MediaHandler) Delete(c tele.Context) error {
@@ -47,6 +48,12 @@ func (h *MediaHandler) Random(c tele.Context) error {
 	if err != nil {
 		return c.Send(err.Error())
 	}
-	photo := &tele.Photo{File: tele.File{FileID: media.Link}}
-	return c.Send(photo)
+	switch media.Type {
+	case "photo":
+		return c.Send(&tele.Photo{File: tele.File{FileID: media.Link}})
+	case "video":
+		return c.Send(&tele.Video{File: tele.File{FileID: media.Link}})
+	default:
+		return c.Send("Неизвестный тип файла")
+	}
 }

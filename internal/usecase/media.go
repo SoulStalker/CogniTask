@@ -40,5 +40,5 @@ func (s *MediaService) Random() (domain.Media, error) {
 		}
 		return s.repo.Random()
 	}
-	return media, nil
+	return media, err
 }

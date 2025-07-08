@@ -91,6 +91,8 @@ func main() {
 	b.Handle(keyboards.BtnAdd, h.Add)
 	b.Handle(keyboards.BtnPending, h.Pending)
 	b.Handle(keyboards.BtnComplete, h.Complete)
+	b.Handle(keyboards.BtnDelete, h.Delete)
+	b.Handle(keyboards.BtnAll, h.All)
 
 	// media
 	b.Handle(tele.OnMedia, mh.Create)

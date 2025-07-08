@@ -46,6 +46,7 @@ func main() {
 	// init service
 	taskUC := usecase.NewTaskService(taskRepo)
 	mediaUC := usecase.NewMediaService(mediaRepo)
+	settingsUC := usecase.NewSettingsService(taskRepo)
 
 	// init redis
 	rdb := redis.NewClient(&redis.Options{
@@ -66,6 +67,7 @@ func main() {
 	// init handler
 	h := handlers.NewTaskHandler(fsmService, taskUC, ctx)
 	mh := handlers.NewMediaHandler(mediaUC, ctx)
+	sh := handlers.NewSettingsHandler(*settingsUC)
 
 	// run bot polling
 	b, err := tele.NewBot(tele.Settings{
@@ -97,6 +99,9 @@ func main() {
 	// media
 	b.Handle(tele.OnMedia, mh.Create)
 	// b.Handle(keyboards.BtnRandomPic, mh.Random)
+
+	// settings
+	b.Handle(keyboards.BtnSettings, sh.Settings)
 
 	// other
 	b.Handle(tele.OnCallback, h.HandCallback)

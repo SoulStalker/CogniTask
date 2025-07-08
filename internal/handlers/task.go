@@ -40,12 +40,12 @@ func (h *TaskHandler) Pending(c tele.Context) error {
 		return c.Send(err.Error())
 	}
 	if len(tasks) == 0 {
-		return c.Edit("У вас нет открытых задач", keyboards.CreateMainKeyboard())
+		return c.Edit(messages.BotMessages.NoOpenTasks, keyboards.CreateMainKeyboard())
 	}
 
 	rows := formatTaskList(tasks)
 
-	return c.Edit("Текущие задачи:", &tele.ReplyMarkup{InlineKeyboard: rows})
+	return c.Edit(messages.BotMessages.YourTasks, &tele.ReplyMarkup{InlineKeyboard: rows})
 }
 
 // All выводит список всех задач
@@ -60,12 +60,12 @@ func (h *TaskHandler) All(c tele.Context) error {
 		return c.Send(err.Error())
 	}
 	if len(tasks) == 0 {
-		return c.Edit("У вас нет задач", keyboards.CreateMainKeyboard())
+		return c.Edit(messages.BotMessages.NoTasks, keyboards.CreateMainKeyboard())
 	}
 
 	rows := formatTaskList(tasks)
 
-	return c.Edit("Ваши задачи:", &tele.ReplyMarkup{InlineKeyboard: rows})
+	return c.Edit(messages.BotMessages.YourTasks, &tele.ReplyMarkup{InlineKeyboard: rows})
 }
 
 // Add  хендлер для обработки команды  Add
@@ -147,7 +147,7 @@ func (h *TaskHandler) Complete(c tele.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.Edit("✅ Задача завершена", keyboards.CreateMainKeyboard())
+	return c.Edit(messages.BotMessages.TaskCompleted, keyboards.CreateMainKeyboard())
 }
 
 // Delete удаление задачи
@@ -168,7 +168,7 @@ func (h *TaskHandler) Delete(c tele.Context) error {
 		return err
 	}
 
-	return c.Edit("❌ Задача удалена", keyboards.CreateMainKeyboard())
+	return c.Edit(messages.BotMessages.TaskDeleted, keyboards.CreateMainKeyboard())
 }
 
 func (h *TaskHandler) createTask(c tele.Context, state *fsm.FSMData) error {

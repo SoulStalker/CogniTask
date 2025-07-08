@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/SoulStalker/cognitask/internal/domain"
+	"github.com/SoulStalker/cognitask/internal/messages"
 	"github.com/SoulStalker/cognitask/internal/usecase"
 	tele "gopkg.in/telebot.v3"
 )
@@ -27,7 +28,7 @@ func (h *MediaHandler) Create(c tele.Context) error {
 	if err != nil {
 		c.Send(err.Error())
 	}
-	return c.Send("Файл сохранен")
+	return c.Send(messages.BotMessages.FileSaved)
 }
 
 func (h *MediaHandler) Delete(c tele.Context) error {
@@ -36,7 +37,7 @@ func (h *MediaHandler) Delete(c tele.Context) error {
 	if err != nil {
 		return c.Send(err.Error())
 	}
-	return c.Send("Deleted")
+	return c.Send(messages.BotMessages.FileDeleted)
 }
 
 func (h *MediaHandler) GetByLink(c tele.Context) error {
@@ -54,6 +55,6 @@ func (h *MediaHandler) Random(c tele.Context) error {
 	case "video":
 		return c.Send(&tele.Video{File: tele.File{FileID: media.Link}})
 	default:
-		return c.Send("Неизвестный тип файла")
+		return c.Send(messages.BotMessages.UnknownType)
 	}
 }

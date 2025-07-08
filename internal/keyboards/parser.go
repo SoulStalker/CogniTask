@@ -3,6 +3,8 @@ package keyboards
 import (
 	"fmt"
 	"time"
+
+	"github.com/SoulStalker/cognitask/internal/messages"
 )
 
 // todo надо подумать может лучше просто принимать цифру текущего месяца
@@ -32,7 +34,7 @@ func ParseDate(dateStr string) (time.Time, error) {
 		}
 	}
 
-	return time.Time{}, fmt.Errorf("неподдерживаемый формат даты.\nИспользуйте: DD.MM.YYYY или YYYY-MM-DD")
+	return time.Time{}, fmt.Errorf(messages.BotMessages.IncompatibleDate)
 }
 
 func GetTodayDate() string {

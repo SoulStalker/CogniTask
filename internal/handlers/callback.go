@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	"github.com/SoulStalker/cognitask/internal/fsm"
@@ -43,5 +44,5 @@ func (r *CallbackRouter) Handle(c tele.Context) error {
 		}
 	}
 
-	return c.Send("Какой-то не такой callback")
+	return c.Send(fmt.Sprintf("Wrong callback int state %s", data))
 }

@@ -8,20 +8,31 @@ import (
 
 // Глобальные кнопки для регистрации хендлеров
 var (
-	BtnComplete   = &tele.InlineButton{Unique: "complete_task", Text: "✅ Выполнить"}
-	BtnDelete     = &tele.InlineButton{Unique: "delete_task", Text: "🗑 Удалить"}
-	BtnEditDate   = &tele.InlineButton{Unique: "edit_date", Text: "📅 Изменить дату"}
-	BtnCancel     = &tele.InlineButton{Unique: "cancel", Text: "🚫 Отмена"}
-	BtnAdd        = &tele.InlineButton{Unique: "add", Text: "Новая задача"}
-	BtnSettings   = &tele.InlineButton{Unique: "settings", Text: "Настройки"}
-	BtnPending    = &tele.InlineButton{Unique: "pending", Text: "Текущие задачи"}
-	BtnAll        = &tele.InlineButton{Unique: "all_tasks", Text: "Все задачи"}
-	BtnRandomPic  = &tele.InlineButton{Unique: "random_pic", Text: "🎲 Random Pic"}
-	BtnToday      = &tele.InlineButton{Unique: "today", Text: "📅 Сегодня"}
-	BtnTomorrow   = &tele.InlineButton{Unique: "tomorrow", Text: "🌅 Завтра"}
-	BtnCalendar   = &tele.InlineButton{Unique: "choose", Text: "🗓️ Выбрать"}
-	BtnSkipDate   = &tele.InlineButton{Unique: "skip", Text: "⏭️ Пропустить"}
-	BtnAutoDelete = &tele.InlineButton{Unique: "setDeleteDays", Text: "🗑 Авто-удаление"}
+	BtnCancel = &tele.InlineButton{Unique: "cancel", Text: "🚫 Отмена"}
+	// кнопки основной клавы
+	BtnSettings  = &tele.InlineButton{Unique: "settings", Text: "Настройки"}
+	BtnPending   = &tele.InlineButton{Unique: "pending", Text: "Текущие задачи"}
+	BtnAll       = &tele.InlineButton{Unique: "all_tasks", Text: "Все задачи"}
+	BtnRandomPic = &tele.InlineButton{Unique: "random_pic", Text: "🎲 Random Pic"}
+
+	// кнопки задач
+	BtnComplete = &tele.InlineButton{Unique: "complete_task", Text: "✅ Выполнить"}
+	BtnDelete   = &tele.InlineButton{Unique: "delete_task", Text: "🗑 Удалить"}
+	BtnEditDate = &tele.InlineButton{Unique: "edit_date", Text: "📅 Изменить дату"}
+	BtnAdd      = &tele.InlineButton{Unique: "add", Text: "Новая задача"}
+
+	// кнопки добавления задачи
+	BtnToday    = &tele.InlineButton{Unique: "today", Text: "📅 Сегодня"}
+	BtnTomorrow = &tele.InlineButton{Unique: "tomorrow", Text: "🌅 Завтра"}
+	BtnCalendar = &tele.InlineButton{Unique: "choose", Text: "🗓️ Выбрать"}
+	BtnSkipDate = &tele.InlineButton{Unique: "skip", Text: "⏭️ Пропустить"}
+
+	// кнопки настроек
+	BtnAutoDelete    = &tele.InlineButton{Unique: "setDeleteDays", Text: "🗑 Авто-удаление"}
+	BtnNotifications = &tele.InlineButton{Unique: "setNotifications", Text: "🔔 Интервал уведомлений"}
+	BtnNotifyFrom    = &tele.InlineButton{Unique: "setNotifyFrom", Text: "▶️ Начало уведомлений"}
+	BtnNotifyTo      = &tele.InlineButton{Unique: "setNotifyTo", Text: "⬇️  Конец уведомлений"}
+	BtnRandomHour    = &tele.InlineButton{Unique: "setRandomHour", Text: "💪 Время мотивации"}
 )
 
 // GetDateSelectionKeyboard клавиатура для выбора даты задачи
@@ -91,14 +102,18 @@ func CreateTaskKeyboard(taskID uint) *tele.ReplyMarkup {
 func CreateSettingsKeyboard() *tele.ReplyMarkup {
 	kb := &tele.ReplyMarkup{}
 
-	// Кнопки настроек (заготовка для будущего)
-	btnNotifications := kb.Data("🔔 Уведомления", "settings_notifications")
-	btnAutoDelete := kb.Data(BtnAutoDelete.Text, BtnAutoDelete.Unique, "")
+	btnAutoDelete := kb.Data(BtnAutoDelete.Text, BtnAutoDelete.Unique)
+	btnNotifications := kb.Data(BtnNotifications.Text, BtnNotifications.Unique)
+	btnNotifyFrom := kb.Data(BtnNotifyFrom.Text, BtnNotifyFrom.Unique)
+	btnNotifyTo := kb.Data(BtnNotifyTo.Text, BtnNotifyTo.Unique)
+	btnRandomHour := kb.Data(BtnRandomHour.Text, BtnRandomHour.Unique)
+
 	cancel := kb.Data(BtnCancel.Text, BtnCancel.Unique)
 
 	kb.Inline(
-		kb.Row(btnNotifications),
-		kb.Row(btnAutoDelete),
+		kb.Row(btnAutoDelete, btnNotifications),
+		kb.Row(btnNotifyFrom, btnNotifyTo),
+		kb.Row(btnRandomHour),
 		kb.Row(cancel),
 	)
 
@@ -115,25 +130,23 @@ func CreateCancelKeyboard() *tele.ReplyMarkup {
 }
 
 func CreateHoursKeyboard(rowsCount int) *tele.ReplyMarkup {
-    kb := &tele.ReplyMarkup{}
-    if rowsCount < 1 {
-        rowsCount = 1
-    }
+	kb := &tele.ReplyMarkup{}
+	if rowsCount < 1 {
+		rowsCount = 1
+	}
 
-    var btns []tele.Btn
-    for i := 1; i <= 24; i++ {
-        btns = append(btns, kb.Data(fmt.Sprint(i), fmt.Sprint(i)))
-    }
+	var btns []tele.Btn
+	for i := 1; i <= 24; i++ {
+		btns = append(btns, kb.Data(fmt.Sprint(i), fmt.Sprint(i)))
+	}
 
-    cancel := kb.Data(BtnCancel.Text, BtnCancel.Unique)
+	cancel := kb.Data(BtnCancel.Text, BtnCancel.Unique)
 
-    perRow := (len(btns) + rowsCount - 1) / rowsCount
-    rows := kb.Split(perRow, btns)
+	perRow := (len(btns) + rowsCount - 1) / rowsCount
+	rows := kb.Split(perRow, btns)
 
-    rows = append(rows, kb.Row(cancel))
+	rows = append(rows, kb.Row(cancel))
 
-    kb.Inline(rows...)
-    return kb
+	kb.Inline(rows...)
+	return kb
 }
-
-

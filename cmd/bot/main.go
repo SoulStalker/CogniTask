@@ -105,6 +105,10 @@ func main() {
 	// settings
 	b.Handle(keyboards.BtnSettings, sh.Settings)
 	b.Handle(keyboards.BtnAutoDelete, sh.SetDeleteDays)
+	b.Handle(keyboards.BtnNotifications, sh.SetNotificationHours)
+	b.Handle(keyboards.BtnNotifyFrom, sh.SetNotifyFrom)
+	b.Handle(keyboards.BtnNotifyTo, sh.SetNotifyTo)
+	b.Handle(keyboards.BtnRandomHour, sh.SetRandomHour)
 
 	// other
 	b.Handle(tele.OnCallback, cbRouter.Handle)

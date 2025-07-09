@@ -62,39 +62,57 @@ func (h *SettingsHandler) Settings(c tele.Context) error {
 	if err != nil {
 		return c.Edit(err.Error())
 	}
-	var sets string
+	currentSettings := "Текущие настройки: \n\n"
 
-	// пока так замокаю
+	currentSettings += fmt.Sprintf("Автоматическое удаление выполненных задач после дней: %d\n", settings.DeleteAfterDays)
+	currentSettings += fmt.Sprintf("Период уведомлений в часах: %d\n", settings.NotificationHours)
+	currentSettings += fmt.Sprintf("Начало уведомления в : %d\n", settings.NotifyFrom)
+	currentSettings += fmt.Sprintf("Конец уведомлений в : %d\n", settings.NotifyTo)
+	currentSettings += fmt.Sprintf("Присылать мотиватор в : %d\n\n", settings.RandomHour)
 
-	sets += fmt.Sprintf("DeleteAfterDays: %d\n", settings.DeleteAfterDays)
-	sets += fmt.Sprintf("NotificationHours: %d\n", settings.NotificationHours)
-	sets += fmt.Sprintf("NotifyFrom: %d\n", settings.NotifyFrom)
-	sets += fmt.Sprintf("NotifyTo: %d\n", settings.NotifyTo)
-	sets += fmt.Sprintf("RandomHour: %d\n", settings.RandomHour)
+	currentSettings += "Можешь изменить настройки по кнопкам ниже\n"
 
-	return c.Edit(sets, keyboards.CreateSettingsKeyboard())
+	return c.Edit(currentSettings, keyboards.CreateSettingsKeyboard())
 }
 
 func (h *SettingsHandler) SetDeleteDays(c tele.Context) error {
-	err := c.Respond()
+	err := h.setState(c, fsm.StateDeleteAfterDays)
 	if err != nil {
-		return c.Edit(err.Error())
+		c.Edit(err.Error())
 	}
+	return nil
+}
 
-	userID := c.Sender().ID
-	if err := h.fsmService.ClearState(h.ctx, userID); err != nil {
-		log.Printf("Failed to clear state: %v", err)
+func (h *SettingsHandler) SetNotificationHours(c tele.Context) error {
+	err := h.setState(c, fsm.StateNotificationHours)
+	if err != nil {
+		c.Edit(err.Error())
 	}
+	return nil
+}
 
-	state := &fsm.FSMData{
-		State: fsm.StateDeleteAfterDays,
+func (h *SettingsHandler) SetNotifyFrom(c tele.Context) error {
+	err := h.setState(c, fsm.StateNotifyFrom)
+	if err != nil {
+		c.Edit(err.Error())
 	}
+	return nil
+}
 
-	if err := h.fsmService.SetState(h.ctx, userID, state); err != nil {
-		log.Printf("Failed to set state: %v", err)
-		c.Edit(messages.BotMessages.ErrorSomeError)
+func (h *SettingsHandler) SetNotifyTo(c tele.Context) error {
+	err := h.setState(c, fsm.StateNotifyTo)
+	if err != nil {
+		c.Edit(err.Error())
 	}
-	return c.Edit("Выбери число: ", keyboards.CreateHoursKeyboard(4))
+	return nil
+}
+
+func (h *SettingsHandler) SetRandomHour(c tele.Context) error {
+	err := h.setState(c, fsm.StateRandom)
+	if err != nil {
+		c.Edit(err.Error())
+	}
+	return nil
 }
 
 func (h *SettingsHandler) processDeleteDays(c tele.Context) error {
@@ -115,6 +133,28 @@ func (h *SettingsHandler) processDeleteDays(c tele.Context) error {
 	}
 
 	return c.Edit(cleanDays, keyboards.CreateSettingsKeyboard())
+}
+
+func (h *SettingsHandler) setState(c tele.Context, newState string) error {
+	err := c.Respond()
+	if err != nil {
+		return c.Edit(err.Error())
+	}
+
+	userID := c.Sender().ID
+	if err := h.fsmService.ClearState(h.ctx, userID); err != nil {
+		log.Printf("Failed to clear state: %v", err)
+	}
+
+	state := &fsm.FSMData{
+		State: newState,
+	}
+
+	if err := h.fsmService.SetState(h.ctx, userID, state); err != nil {
+		log.Printf("Failed to set state: %v", err)
+		c.Edit(messages.BotMessages.ErrorSomeError)
+	}
+	return c.Edit("Выбери число: ", keyboards.CreateHoursKeyboard(4))
 }
 
 

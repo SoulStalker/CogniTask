@@ -66,10 +66,10 @@ func main() {
 	fsmService := fsm.NewFSMService(rdb, cfg.FSMTimeout)
 
 	// init handler
-	h := handlers.NewTaskHandler(fsmService, taskUC, ctx)
+	th := handlers.NewTaskHandler(fsmService, taskUC, ctx)
 	mh := handlers.NewMediaHandler(mediaUC, ctx)
-	sh := handlers.NewSettingsHandler(*settingsUC)
-	cbRouter := handlers.NewCallbackRouter([]handlers.CallbackHandler{h}, fsmService, ctx)
+	sh := handlers.NewSettingsHandler(fsmService, *settingsUC, ctx)
+	cbRouter := handlers.NewCallbackRouter([]handlers.CallbackHandler{th, sh}, fsmService, ctx)
 
 	// run bot polling
 	b, err := tele.NewBot(tele.Settings{
@@ -85,18 +85,18 @@ func main() {
 	b.Use(middleware.AuthMiddleware(cfg.ChatId))
 
 	// commands
-	b.Handle("/start", h.Start)
-	b.Handle("/help", h.Help)
+	b.Handle("/start", th.Start)
+	b.Handle("/help", th.Help)
 	b.Handle("/random", mh.Random)
 
 	// tasks
-	b.Handle(tele.OnText, h.HandleText)
+	b.Handle(tele.OnText, th.HandleText)
 
-	b.Handle(keyboards.BtnAdd, h.Add)
-	b.Handle(keyboards.BtnPending, h.Pending)
-	b.Handle(keyboards.BtnComplete, h.Complete)
-	b.Handle(keyboards.BtnDelete, h.Delete)
-	b.Handle(keyboards.BtnAll, h.All)
+	b.Handle(keyboards.BtnAdd, th.Add)
+	b.Handle(keyboards.BtnPending, th.Pending)
+	b.Handle(keyboards.BtnComplete, th.Complete)
+	b.Handle(keyboards.BtnDelete, th.Delete)
+	b.Handle(keyboards.BtnAll, th.All)
 
 	// media
 	b.Handle(tele.OnMedia, mh.Create)
@@ -108,7 +108,7 @@ func main() {
 
 	// other
 	b.Handle(tele.OnCallback, cbRouter.Handle)
-	b.Handle(keyboards.BtnCancel, h.Cancel)
+	b.Handle(keyboards.BtnCancel, th.Cancel)
 
 	// Graceful shutdown
 	go func() {

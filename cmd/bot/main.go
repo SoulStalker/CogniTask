@@ -42,11 +42,12 @@ func main() {
 	// init repo
 	taskRepo := infra.New(db)
 	mediaRepo := infra.NewMediaRepo(db)
+	settingRepo := infra.NewSettingsRepository(db)
 
 	// init service
 	taskUC := usecase.NewTaskService(taskRepo)
 	mediaUC := usecase.NewMediaService(mediaRepo)
-	settingsUC := usecase.NewSettingsService(taskRepo)
+	settingsUC := usecase.NewSettingsService(settingRepo)
 
 	// init redis
 	rdb := redis.NewClient(&redis.Options{

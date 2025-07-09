@@ -1,6 +1,7 @@
 package domain
 
 type Settings struct {
+	ID                uint `gorm:"primaryKey"`
 	DeleteAfterDays   uint // Удалять закрытые задачи после N дней
 	NotificationHours uint // Интервал уведомлений в часах
 	NotifyFrom        uint // Уведомления от
@@ -10,9 +11,9 @@ type Settings struct {
 
 type SettingsRepository interface {
 	All() (Settings, error)
-	SetDeleteDays(days uint) (Settings, error)
-	SetNotificationHours(hours uint) (Settings, error)
-	SetNotifyFrom(hours uint) (Settings, error)
-	SetNotifyTo(hours uint) (Settings, error)
-	SetRandomHour(hour uint) (Settings, error)
+	SetDeleteDays(days uint) error
+	SetNotificationHours(hours uint) error
+	SetNotifyFrom(hours uint) error
+	SetNotifyTo(hours uint) error
+	SetRandomHour(hour uint) error
 }

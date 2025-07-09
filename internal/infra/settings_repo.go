@@ -24,22 +24,42 @@ func (r *GormSettingsRepo) All() (domain.Settings, error) {
 	return settings, nil
 }
 
-func (r *GormSettingsRepo) SetDeleteDays(days uint) (domain.Settings, error) {
-
+func (r *GormSettingsRepo) SetDeleteDays(days uint) error {
+	err := r.DB.Model(&domain.Settings{}).Where("id=?", 1).Updates(domain.Settings{DeleteAfterDays: days}).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func (r *GormSettingsRepo) SetNotificationHours(hours uint) (domain.Settings, error) {
-
+func (r *GormSettingsRepo) SetNotificationHours(hours uint) error {
+	err := r.DB.Model(&domain.Settings{}).Where("id=?", 1).Updates(domain.Settings{NotificationHours: hours}).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func (r *GormSettingsRepo) SetNotifyFrom(hours uint) (domain.Settings, error) {
-
+func (r *GormSettingsRepo) SetNotifyFrom(hours uint) error {
+	err := r.DB.Model(&domain.Settings{}).Where("id=?", 1).Updates(domain.Settings{NotifyFrom: hours}).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func (r *GormSettingsRepo) SetNotifyTo(hours uint) (domain.Settings, error) {
-
+func (r *GormSettingsRepo) SetNotifyTo(hours uint) error {
+	err := r.DB.Model(&domain.Settings{}).Where("id=?", 1).Updates(domain.Settings{NotifyTo: hours}).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func (r *GormSettingsRepo) SetRandomHour(hour uint) (domain.Settings, error) {
-
+func (r *GormSettingsRepo) SetRandomHour(hour uint) error {
+	err := r.DB.Model(&domain.Settings{}).Where("id=?", 1).Updates(domain.Settings{RandomHour: hour}).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }

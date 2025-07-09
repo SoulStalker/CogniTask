@@ -3,9 +3,13 @@ package handlers
 import (
 	"context"
 	"fmt"
+	"log"
+	"strconv"
+	"strings"
 
 	"github.com/SoulStalker/cognitask/internal/fsm"
 	"github.com/SoulStalker/cognitask/internal/keyboards"
+	"github.com/SoulStalker/cognitask/internal/messages"
 	"github.com/SoulStalker/cognitask/internal/usecase"
 	tele "gopkg.in/telebot.v3"
 )
@@ -73,10 +77,39 @@ func (h *SettingsHandler) SetDeleteDays(c tele.Context) error {
 	// 	return c.Edit(err.Error())
 	// }
 	// return c.Edit("ok", keyboards.CreateSettingsKeyboard())
+	userID := c.Sender().ID
+	if err := h.fsmService.ClearState(h.ctx, userID); err != nil {
+		log.Printf("Failed to clear state: %v", err)
+	}
 
+	state := &fsm.FSMData{
+		State: fsm.StateDeleteAfterDays,
+	}
+
+	if err := h.fsmService.SetState(h.ctx, userID, state); err != nil {
+		log.Printf("Failed to set state: %v", err)
+		c.Edit(messages.BotMessages.ErrorSomeError)
+	}
 	return c.Edit("Выбери нужный час: ", keyboards.CreateHoursKeyboard(4))
 }
 
-func (h *SettingsHandler) processDeleteDays(c tele.Context, data *fsm.FSMData) error {
-	return nil
+func (h *SettingsHandler) processDeleteDays(c tele.Context, state *fsm.FSMData) error {
+	userID := c.Sender().ID
+	rawDays := c.Callback().Data
+	state.DeleteAfterDays = strings.Join(strings.Fields(rawDays), " ")
+	deleteDays, err := strconv.Atoi(state.DeleteAfterDays)
+	if err != nil {
+		return c.Edit(err.Error())
+	}
+
+	err = h.service.SetDeleteDays(uint(deleteDays))
+	if err != nil {
+		c.Edit(err.Error())
+	}
+
+	if err := h.fsmService.ClearState(h.ctx, userID); err != nil {
+		log.Printf("Failed to clear state: %v", err)
+	}
+
+	return c.Edit(state.DeleteAfterDays, keyboards.CreateSettingsKeyboard())
 }

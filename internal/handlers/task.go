@@ -94,7 +94,7 @@ func (h *TaskHandler) Add(c tele.Context) error {
 
 	userID := c.Sender().ID
 
-	if err := h.fsmService.ClearState(h.ctx, c.Sender().ID); err != nil {
+	if err := h.fsmService.ClearState(h.ctx, userID); err != nil {
 		log.Printf("Failed to clear state: %v", err)
 	}
 

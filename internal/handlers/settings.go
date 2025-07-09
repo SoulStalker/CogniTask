@@ -30,7 +30,7 @@ func (h *SettingsHandler) Settings(c tele.Context) error {
 	var sets string
 
 	// пока так замокаю
-	
+
 	sets += fmt.Sprintf("%d\n", settings.DeleteAfterDays)
 	sets += fmt.Sprintf("%d\n", settings.NotificationHours)
 	sets += fmt.Sprintf("%d\n", settings.NotifyFrom)
@@ -38,4 +38,19 @@ func (h *SettingsHandler) Settings(c tele.Context) error {
 	sets += fmt.Sprintf("%d\n", settings.RandomHour)
 
 	return c.Edit(sets, keyboards.CreateSettingsKeyboard())
+}
+
+
+func (h *SettingsHandler) SetDeleteDays(c tele.Context) error {
+	err := c.Respond()
+	if err != nil {
+		return c.Edit(err.Error())
+	}
+	// err = h.service.SetDeleteDays(100)
+	// if err != nil {
+	// 	return c.Edit(err.Error())
+	// }
+	// return c.Edit("ok", keyboards.CreateSettingsKeyboard())
+
+	return c.Edit("Выбери нужный час: ", keyboards.CreateHoursKeyboard(4))
 }

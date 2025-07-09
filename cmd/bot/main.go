@@ -103,6 +103,7 @@ func main() {
 
 	// settings
 	b.Handle(keyboards.BtnSettings, sh.Settings)
+	b.Handle(keyboards.BtnAutoDelete, sh.SetDeleteDays)
 
 	// other
 	b.Handle(tele.OnCallback, h.HandCallback)

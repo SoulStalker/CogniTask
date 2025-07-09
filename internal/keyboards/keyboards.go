@@ -8,19 +8,20 @@ import (
 
 // Глобальные кнопки для регистрации хендлеров
 var (
-	BtnComplete  = &tele.InlineButton{Unique: "complete_task", Text: "✅ Выполнить"}
-	BtnDelete    = &tele.InlineButton{Unique: "delete_task", Text: "🗑 Удалить"}
-	BtnEditDate  = &tele.InlineButton{Unique: "edit_date", Text: "📅 Изменить дату"}
-	BtnCancel    = &tele.InlineButton{Unique: "cancel", Text: "🚫 Отмена"}
-	BtnAdd       = &tele.InlineButton{Unique: "add", Text: "Новая задача"}
-	BtnSettings  = &tele.InlineButton{Unique: "settings", Text: "Настройки"}
-	BtnPending   = &tele.InlineButton{Unique: "pending", Text: "Текущие задачи"}
-	BtnAll       = &tele.InlineButton{Unique: "all_tasks", Text: "Все задачи"}
-	BtnRandomPic = &tele.InlineButton{Unique: "random_pic", Text: "🎲 Random Pic"}
-	BtnToday     = &tele.InlineButton{Unique: "today", Text: "📅 Сегодня"}
-	BtnTomorrow  = &tele.InlineButton{Unique: "tomorrow", Text: "🌅 Завтра"}
-	BtnCalendar  = &tele.InlineButton{Unique: "choose", Text: "🗓️ Выбрать"}
-	BtnSkipDate  = &tele.InlineButton{Unique: "skip", Text: "⏭️ Пропустить"}
+	BtnComplete   = &tele.InlineButton{Unique: "complete_task", Text: "✅ Выполнить"}
+	BtnDelete     = &tele.InlineButton{Unique: "delete_task", Text: "🗑 Удалить"}
+	BtnEditDate   = &tele.InlineButton{Unique: "edit_date", Text: "📅 Изменить дату"}
+	BtnCancel     = &tele.InlineButton{Unique: "cancel", Text: "🚫 Отмена"}
+	BtnAdd        = &tele.InlineButton{Unique: "add", Text: "Новая задача"}
+	BtnSettings   = &tele.InlineButton{Unique: "settings", Text: "Настройки"}
+	BtnPending    = &tele.InlineButton{Unique: "pending", Text: "Текущие задачи"}
+	BtnAll        = &tele.InlineButton{Unique: "all_tasks", Text: "Все задачи"}
+	BtnRandomPic  = &tele.InlineButton{Unique: "random_pic", Text: "🎲 Random Pic"}
+	BtnToday      = &tele.InlineButton{Unique: "today", Text: "📅 Сегодня"}
+	BtnTomorrow   = &tele.InlineButton{Unique: "tomorrow", Text: "🌅 Завтра"}
+	BtnCalendar   = &tele.InlineButton{Unique: "choose", Text: "🗓️ Выбрать"}
+	BtnSkipDate   = &tele.InlineButton{Unique: "skip", Text: "⏭️ Пропустить"}
+	BtnAutoDelete = &tele.InlineButton{Unique: "setDeleteDays", Text: "🗑 Авто-удаление"}
 )
 
 // GetDateSelectionKeyboard клавиатура для выбора даты задачи
@@ -88,18 +89,20 @@ func CreateTaskKeyboard(taskID uint) *tele.ReplyMarkup {
 
 // CreateSettingsKeyboard создает клавиатуру для настроек
 func CreateSettingsKeyboard() *tele.ReplyMarkup {
-	markup := &tele.ReplyMarkup{}
+	kb := &tele.ReplyMarkup{}
 
 	// Кнопки настроек (заготовка для будущего)
-	btnNotifications := markup.Data("🔔 Уведомления", "settings_notifications")
-	btnAutoDelete := markup.Data("🗑 Авто-удаление", "settings_auto_delete")
+	btnNotifications := kb.Data("🔔 Уведомления", "settings_notifications")
+	btnAutoDelete := kb.Data(BtnAutoDelete.Text, BtnAutoDelete.Unique, "")
+	cancel := kb.Data(BtnCancel.Text, BtnCancel.Unique)
 
-	markup.Inline(
-		markup.Row(btnNotifications),
-		markup.Row(btnAutoDelete),
+	kb.Inline(
+		kb.Row(btnNotifications),
+		kb.Row(btnAutoDelete),
+		kb.Row(cancel),
 	)
 
-	return markup
+	return kb
 }
 
 // CreateMainKeyboard основная клавиатура
@@ -110,3 +113,27 @@ func CreateCancelKeyboard() *tele.ReplyMarkup {
 
 	return kb
 }
+
+func CreateHoursKeyboard(rowsCount int) *tele.ReplyMarkup {
+    kb := &tele.ReplyMarkup{}
+    if rowsCount < 1 {
+        rowsCount = 1
+    }
+
+    var btns []tele.Btn
+    for i := 1; i <= 24; i++ {
+        btns = append(btns, kb.Data(fmt.Sprint(i), fmt.Sprint(i)))
+    }
+
+    cancel := kb.Data(BtnCancel.Text, BtnCancel.Unique)
+
+    perRow := (len(btns) + rowsCount - 1) / rowsCount
+    rows := kb.Split(perRow, btns)
+
+    rows = append(rows, kb.Row(cancel))
+
+    kb.Inline(rows...)
+    return kb
+}
+
+

@@ -28,6 +28,23 @@ func NewTaskHandler(fsm *fsm.FSMService, service *usecase.TaskService, ctx conte
 	}
 }
 
+func (h *TaskHandler) CanHandle(state string) bool {
+	return state == fsm.StateWaitingTaskText ||
+		state == fsm.StateWaitingTaskDate ||
+		state == fsm.StateWaitingTaskCategory
+}
+
+func (h *TaskHandler) Handle(c tele.Context, data *fsm.FSMData) error {
+	switch data.State {
+	case fsm.StateWaitingTaskText:
+		return h.processTaskText(c, data)
+	case fsm.StateWaitingTaskDate:
+		return h.processTaskDate(c, data)
+	default:
+		return c.Send("unknown callback")
+	}
+}
+
 // Pending вывод списка открытых задач
 func (h *TaskHandler) Pending(c tele.Context) error {
 	err := c.Respond()

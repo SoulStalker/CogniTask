@@ -69,6 +69,7 @@ func main() {
 	h := handlers.NewTaskHandler(fsmService, taskUC, ctx)
 	mh := handlers.NewMediaHandler(mediaUC, ctx)
 	sh := handlers.NewSettingsHandler(*settingsUC)
+	cbRouter := handlers.NewCallbackRouter([]handlers.CallbackHandler{h}, fsmService, ctx)
 
 	// run bot polling
 	b, err := tele.NewBot(tele.Settings{
@@ -106,7 +107,7 @@ func main() {
 	b.Handle(keyboards.BtnAutoDelete, sh.SetDeleteDays)
 
 	// other
-	b.Handle(tele.OnCallback, h.HandCallback)
+	b.Handle(tele.OnCallback, cbRouter.Handle)
 	b.Handle(keyboards.BtnCancel, h.Cancel)
 
 	// Graceful shutdown

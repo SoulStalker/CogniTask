@@ -12,10 +12,19 @@ import (
 
 // Состояния FSM
 const (
-	StateIdle                = ""
+	StateIdle = ""
+
+	// состояния при вводе задачи
 	StateWaitingTaskText     = "waiting_task_text"
 	StateWaitingTaskDate     = "waiting_task_date"
 	StateWaitingTaskCategory = "waiting_task_category"
+
+	// состояния при вводе настроек
+	StateDeleteAfterDays   = "set_delete_days"
+	StateNotificationHours = "set_notify_period"
+	StateNotifyFrom        = "set_notify_from"
+	StateNotifyTo          = "set_notify_to"
+	StateRandom            = "set_random_hour"
 )
 
 // FSMData Структура данных FSM

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"log"
 
 	"github.com/SoulStalker/cognitask/internal/fsm"
@@ -8,22 +9,39 @@ import (
 	tele "gopkg.in/telebot.v3"
 )
 
-func (h *TaskHandler) HandCallback(c tele.Context) error {
+type CallbackHandler interface {
+	CanHandle(state string) bool
+	Handle(c tele.Context, data *fsm.FSMData) error
+}
+
+type CallbackRouter struct {
+	handlers []CallbackHandler
+	fsmSvc   *fsm.FSMService
+	ctx      context.Context
+}
+
+func NewCallbackRouter(handlers []CallbackHandler, fsmSvc *fsm.FSMService, ctx context.Context) *CallbackRouter {
+	return &CallbackRouter{
+		handlers: handlers,
+		fsmSvc: fsmSvc,
+		ctx: ctx,
+	}
+}
+
+func (r *CallbackRouter) Handle(c tele.Context) error {
 	userID := c.Sender().ID
 
-	state, err := h.fsmService.GetState(h.ctx, userID)
+	data, err := r.fsmSvc.GetState(r.ctx, userID)
 	if err != nil {
 		log.Printf("Failed to get state: %v", err)
 		return c.Send(messages.BotMessages.ErrorTryAgain)
 	}
 
-	switch state.State {
-	case fsm.StateWaitingTaskText:
-		return h.processTaskText(c, state)
-	case fsm.StateWaitingTaskDate:
-		return h.processTaskDate(c, state)
-	default:
-		return nil
+	for _, h := range r.handlers {
+		if h.CanHandle(data.State) {
+			return h.Handle(c, data)
+		}
 	}
 
+	return c.Send("Какой-то не такой callback")
 }

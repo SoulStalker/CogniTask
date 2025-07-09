@@ -33,7 +33,6 @@ type FSMData struct {
 	TaskText        string `json:"task_text,omitempty"`
 	TaskDate        string `json:"task_date,omitempty"`
 	TaskCategory    string `json:"task_category,omitempty"`
-	DeleteAfterDays string `json:"settings_delete_days,omitempty"`
 }
 
 // FSMService FSM сервис

@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"fmt"
+
 	"github.com/SoulStalker/cognitask/internal/keyboards"
 	"github.com/SoulStalker/cognitask/internal/usecase"
 	tele "gopkg.in/telebot.v3"
@@ -21,5 +23,19 @@ func (h *SettingsHandler) Settings(c tele.Context) error {
 	if err != nil {
 		return c.Edit(err.Error())
 	}
-	return c.Edit("Settings", keyboards.CreateSettingsKeyboard())
+	settings, err := h.service.All()
+	if err != nil {
+		return c.Edit(err.Error())
+	}
+	var sets string
+
+	// пока так замокаю
+	
+	sets += fmt.Sprintf("%d\n", settings.DeleteAfterDays)
+	sets += fmt.Sprintf("%d\n", settings.NotificationHours)
+	sets += fmt.Sprintf("%d\n", settings.NotifyFrom)
+	sets += fmt.Sprintf("%d\n", settings.NotifyTo)
+	sets += fmt.Sprintf("%d\n", settings.RandomHour)
+
+	return c.Edit(sets, keyboards.CreateSettingsKeyboard())
 }

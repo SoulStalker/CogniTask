@@ -17,6 +17,6 @@ func InitDB(config DBConfig) (*gorm.DB, error) {
 		Logger: config.Logger,
 	})
 
-	db.AutoMigrate(&domain.Task{}, &domain.Media{})
+	db.AutoMigrate(&domain.Task{}, &domain.Media{}, domain.Settings{})
 	return db, err
 }

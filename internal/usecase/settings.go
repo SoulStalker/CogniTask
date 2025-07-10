@@ -35,3 +35,7 @@ func (s *SettingsService) SetNotifyTo(hours uint) error {
 func (s *SettingsService) SetRandomHour(hour uint) error {
 	return s.repo.SetRandomHour(hour)
 }
+
+func (s *SettingsService) Interval() (uint, error) {
+	return s.repo.Interval()
+}

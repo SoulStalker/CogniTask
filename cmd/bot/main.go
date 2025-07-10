@@ -130,8 +130,8 @@ func main() {
 	}()
 
 	// запускаем планировщик
-
-	go scheduler.TaskNotificationsScheduler(intervalChan)
+	notifier := scheduler.NewNotifier(*settingsUC, intervalChan)
+	go notifier.TaskNotificationsScheduler()
 
 	log.Println("Bot started")
 	b.Start()

@@ -16,4 +16,5 @@ type SettingsRepository interface {
 	SetNotifyFrom(hours uint) error
 	SetNotifyTo(hours uint) error
 	SetRandomHour(hour uint) error
+	Interval() (uint, error)
 }

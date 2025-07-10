@@ -63,3 +63,12 @@ func (r *GormSettingsRepo) SetRandomHour(hour uint) error {
 	}
 	return nil
 }
+
+func (r *GormSettingsRepo) Interval() (uint, error) {
+	var setting domain.Settings
+	err := r.DB.First(&setting).Error
+	if err != nil {
+		return 0, err
+	}
+	return setting.NotificationHours, nil
+}

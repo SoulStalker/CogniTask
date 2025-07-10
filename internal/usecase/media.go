@@ -18,7 +18,16 @@ func NewMediaService(repo domain.MediaRepository) *MediaService {
 }
 
 func (s *MediaService) Create(media domain.Media) error {
-	return s.repo.Create(media)
+	existed, err := s.GetByLink(media.Link)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return s.repo.Create(media)
+		}
+	}
+	if existed.Link != "" {
+		return errors.New("такое уже есть")
+	}
+	return err
 }
 
 func (s *MediaService) Delete(media domain.Media) error {

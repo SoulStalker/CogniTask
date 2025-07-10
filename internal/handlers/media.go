@@ -26,7 +26,7 @@ func (h *MediaHandler) Create(c tele.Context) error {
 	fileType := c.Message().Media().MediaType()
 	err := h.service.Create(domain.Media{Link: link, Type: fileType})
 	if err != nil {
-		c.Send(err.Error())
+		return c.Send(err.Error())
 	}
 	return c.Send(messages.BotMessages.FileSaved)
 }

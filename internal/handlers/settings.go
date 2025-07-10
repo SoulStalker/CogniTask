@@ -62,15 +62,15 @@ func (h *SettingsHandler) Settings(c tele.Context) error {
 	if err != nil {
 		return c.Edit(err.Error())
 	}
-	currentSettings := "Текущие настройки: \n\n"
+	currentSettings := "⚙️ Текущие настройки:\n--------------------------\n\n"
 
-	currentSettings += fmt.Sprintf("Автоматическое удаление выполненных задач после дней: %d\n", settings.DeleteAfterDays)
-	currentSettings += fmt.Sprintf("Период уведомлений в часах: %d\n", settings.NotificationHours)
-	currentSettings += fmt.Sprintf("Начало уведомления в : %d\n", settings.NotifyFrom)
-	currentSettings += fmt.Sprintf("Конец уведомлений в : %d\n", settings.NotifyTo)
-	currentSettings += fmt.Sprintf("Присылать мотиватор в : %d\n\n", settings.RandomHour)
+	currentSettings += fmt.Sprintf("🗑️ Авто-удаление выполненных задач через дней: %d\n\n", settings.DeleteAfterDays)
+	currentSettings += fmt.Sprintf("⏰ Период уведомлений (часов): %d\n\n", settings.NotificationHours)
+	currentSettings += fmt.Sprintf("📅 Начало уведомлений в: %d\n\n", settings.NotifyFrom)
+	currentSettings += fmt.Sprintf("📅 Конец уведомлений в: %d\n\n", settings.NotifyTo)
+	currentSettings += fmt.Sprintf("💡 Мотиватор в: %d\n\n", settings.RandomHour)
 
-	currentSettings += "Можешь изменить настройки по кнопкам ниже\n"
+	currentSettings += "Можешь изменить настройки по кнопкам ниже:"
 
 	return c.Edit(currentSettings, keyboards.CreateSettingsKeyboard())
 }
@@ -156,7 +156,6 @@ func (h *SettingsHandler) setState(c tele.Context, newState string) error {
 	}
 	return c.Edit("Выбери число: ", keyboards.CreateHoursKeyboard(4))
 }
-
 
 func (h *SettingsHandler) processNotificationHours(c tele.Context) error {
 	rawHours := c.Callback().Data

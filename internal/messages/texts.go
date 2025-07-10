@@ -36,6 +36,7 @@ type Messages struct {
 	UnknownText    string
 
 	IncompatibleDate string
+	FileExisted      string
 }
 
 var BotMessages = Messages{
@@ -62,4 +63,6 @@ var BotMessages = Messages{
 	TaskDeleted:      "❌ Задача удалена",
 	UnknownText:      "❓ Unknown text: ",
 	IncompatibleDate: "📅 Неподдерживаемый формат даты.\nИспользуйте DD.MM.YYYY или YYYY-MM-DD",
+
+	FileExisted: "‼️ Такой файл уже существует",
 }

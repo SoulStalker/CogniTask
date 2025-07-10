@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/SoulStalker/cognitask/internal/domain"
+	"github.com/SoulStalker/cognitask/internal/messages"
 	"gorm.io/gorm"
 )
 
@@ -25,7 +26,7 @@ func (s *MediaService) Create(media domain.Media) error {
 		}
 	}
 	if existed.Link != "" {
-		return errors.New("такое уже есть")
+		return errors.New(messages.BotMessages.FileExisted)
 	}
 	return err
 }

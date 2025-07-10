@@ -28,11 +28,11 @@ var (
 	BtnSkipDate = &tele.InlineButton{Unique: "skip", Text: "⏭️ Пропустить"}
 
 	// кнопки настроек
-	BtnAutoDelete    = &tele.InlineButton{Unique: "setDeleteDays", Text: "🗑 Авто-удаление"}
-	BtnNotifications = &tele.InlineButton{Unique: "setNotifications", Text: "🔔 Интервал уведомлений"}
-	BtnNotifyFrom    = &tele.InlineButton{Unique: "setNotifyFrom", Text: "▶️ Начало уведомлений"}
-	BtnNotifyTo      = &tele.InlineButton{Unique: "setNotifyTo", Text: "⬇️  Конец уведомлений"}
-	BtnRandomHour    = &tele.InlineButton{Unique: "setRandomHour", Text: "💪 Время мотивации"}
+	BtnAutoDelete    = &tele.InlineButton{Unique: "setDeleteDays", Text: "🗑️ Авто‑удаление"}
+	BtnNotifications = &tele.InlineButton{Unique: "setNotifications", Text: "⏰ Уведомления"}
+	BtnNotifyFrom    = &tele.InlineButton{Unique: "setNotifyFrom", Text: "📅 Начало"}
+	BtnNotifyTo      = &tele.InlineButton{Unique: "setNotifyTo", Text: "📅 Конец"}
+	BtnRandomHour    = &tele.InlineButton{Unique: "setRandomHour", Text: "💡 Мотивация"}
 )
 
 // GetDateSelectionKeyboard клавиатура для выбора даты задачи

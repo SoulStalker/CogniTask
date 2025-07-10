@@ -6,6 +6,7 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/SoulStalker/cognitask/internal/fsm"
 	"github.com/SoulStalker/cognitask/internal/keyboards"
@@ -18,13 +19,15 @@ type SettingsHandler struct {
 	fsmService *fsm.FSMService
 	service    usecase.SettingsService
 	ctx        context.Context
+	ch         chan time.Duration
 }
 
-func NewSettingsHandler(fsmService *fsm.FSMService, uc usecase.SettingsService, ctx context.Context) *SettingsHandler {
+func NewSettingsHandler(fsmService *fsm.FSMService, uc usecase.SettingsService, ctx context.Context, ch chan time.Duration) *SettingsHandler {
 	return &SettingsHandler{
 		fsmService: fsmService,
 		service:    uc,
 		ctx:        ctx,
+		ch:         ch,
 	}
 }
 
@@ -173,7 +176,7 @@ func (h *SettingsHandler) processNotificationHours(c tele.Context) error {
 	if err := h.fsmService.ClearState(h.ctx, c.Sender().ID); err != nil {
 		log.Printf("Failed to clear state: %v", err)
 	}
-
+	h.ch <- time.Duration(hours) * time.Second // минуты для тестов
 	return c.Edit(cleanHours, keyboards.CreateSettingsKeyboard())
 }
 

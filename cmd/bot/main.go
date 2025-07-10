@@ -11,6 +11,7 @@ import (
 
 	"github.com/SoulStalker/cognitask/internal/keyboards"
 	"github.com/SoulStalker/cognitask/internal/messages"
+	"github.com/SoulStalker/cognitask/internal/scheduler"
 
 	tele "gopkg.in/telebot.v3"
 
@@ -25,6 +26,9 @@ import (
 )
 
 func main() {
+	// Канал для планировщика
+	var intervalChan = make(chan time.Duration)
+
 	// Контекст с отменой для graceful shutdown
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -68,7 +72,7 @@ func main() {
 	// init handler
 	th := handlers.NewTaskHandler(fsmService, taskUC, ctx)
 	mh := handlers.NewMediaHandler(mediaUC, ctx)
-	sh := handlers.NewSettingsHandler(fsmService, *settingsUC, ctx)
+	sh := handlers.NewSettingsHandler(fsmService, *settingsUC, ctx, intervalChan)
 	cbRouter := handlers.NewCallbackRouter([]handlers.CallbackHandler{th, sh}, fsmService, ctx)
 
 	// run bot polling
@@ -124,6 +128,10 @@ func main() {
 		b.Stop()
 		cancel()
 	}()
+
+	// запускаем планировщик
+
+	go scheduler.TaskNotificationsScheduler(intervalChan)
 
 	log.Println("Bot started")
 	b.Start()

@@ -12,6 +12,7 @@ import (
 	"github.com/SoulStalker/cognitask/internal/keyboards"
 	"github.com/SoulStalker/cognitask/internal/messages"
 	"github.com/SoulStalker/cognitask/internal/scheduler"
+	"github.com/robfig/cron/v3"
 
 	tele "gopkg.in/telebot.v3"
 
@@ -28,6 +29,17 @@ import (
 func main() {
 	// Канал для планировщика
 	var intervalChan = make(chan time.Duration)
+
+	// крон
+	// cr := cron.New()
+
+	// cr.AddFunc("@every 10s", func() {
+	// 	fmt.Println("Каждые 10 секунд", time.Now())
+	// })
+
+	cr := scheduler.NewScheduler(cron.New())
+	cr.InitDefaultSchedule()
+	
 
 	// Контекст с отменой для graceful shutdown
 	ctx, cancel := context.WithCancel(context.Background())
@@ -129,10 +141,9 @@ func main() {
 		cancel()
 	}()
 
-		// запускаем планировщик
+	// запускаем планировщик
 	notifier := scheduler.NewNotifier(*settingsUC, *taskUC, intervalChan, b)
 	go notifier.TaskNotificationsScheduler(cfg.ChatId)
-
 
 	log.Println("Bot started")
 	b.Start()

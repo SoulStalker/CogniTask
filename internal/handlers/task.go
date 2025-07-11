@@ -60,7 +60,7 @@ func (h *TaskHandler) Pending(c tele.Context) error {
 		return c.Edit(messages.BotMessages.NoOpenTasks, keyboards.CreateMainKeyboard())
 	}
 
-	rows := formatTaskList(tasks)
+	rows := FormatTaskList(tasks)
 
 	return c.Edit(messages.BotMessages.YourTasks, &tele.ReplyMarkup{InlineKeyboard: rows})
 }
@@ -80,7 +80,7 @@ func (h *TaskHandler) All(c tele.Context) error {
 		return c.Edit(messages.BotMessages.NoTasks, keyboards.CreateMainKeyboard())
 	}
 
-	rows := formatTaskList(tasks)
+	rows := FormatTaskList(tasks)
 
 	return c.Edit(messages.BotMessages.YourTasks, &tele.ReplyMarkup{InlineKeyboard: rows})
 }

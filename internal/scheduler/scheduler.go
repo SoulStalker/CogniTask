@@ -1,41 +1,65 @@
 package scheduler
 
 import (
-	"fmt"
 	"log"
 	"time"
 
+	"github.com/SoulStalker/cognitask/internal/handlers"
+	"github.com/SoulStalker/cognitask/internal/messages"
 	"github.com/SoulStalker/cognitask/internal/usecase"
+	tele "gopkg.in/telebot.v3"
 )
 
 type Notifier struct {
-	settings usecase.SettingsService
-	ch       chan (time.Duration)
+	settingsSvc usecase.SettingsService
+	tasksSvc    usecase.TaskService
+	ch          chan (time.Duration)
+	bot         *tele.Bot
 }
 
-func NewNotifier(settings usecase.SettingsService, ch       chan (time.Duration)) *Notifier {
+func NewNotifier(
+	settingsSvc usecase.SettingsService,
+	tasksSvc usecase.TaskService,
+	ch chan (time.Duration),
+	bot *tele.Bot,
+) *Notifier {
 	return &Notifier{
-		settings: settings,
-		ch: ch,
+		settingsSvc: settingsSvc,
+		tasksSvc:    tasksSvc,
+		ch:          ch,
+		bot:         bot,
 	}
 }
 
 // TaskNotificationsScheduler -  отправляет список задач по каждый указанный интервал в часах
-func (n *Notifier) TaskNotificationsScheduler() {
-	newInterval, err := n.settings.Interval()
+func (n *Notifier) TaskNotificationsScheduler(chaiID int64) {
+	recipient := tele.ChatID(chaiID)
+
+	newInterval, err := n.settingsSvc.Interval()
 	if err != nil {
 		log.Println(err.Error())
 	}
-	ticker := time.NewTicker(time.Duration(newInterval) * time.Second)
+
+	ticker := time.NewTicker(time.Duration(newInterval) * time.Hour)
 
 	for {
 		select {
 		case <-ticker.C:
-			fmt.Println("🔔 Напоминание! Время:", time.Now())
+			currentTasks, err := n.tasksSvc.GetPending()
+			if err != nil {
+				n.bot.Send(recipient, "Не смог отправить задачи:\n"+err.Error())
+			}
+
+			rows := handlers.FormatTaskList(currentTasks)
+			res, err := n.bot.Send(recipient, messages.BotMessages.YourTasks, &tele.ReplyMarkup{InlineKeyboard: rows})
+
+			if err != nil {
+				log.Printf("Не смог отправить задачи:\n%v, %v", err, res)
+			}
+
 		case interval := <-n.ch:
-			fmt.Println("⏱ Новый интервал:", interval)
 			ticker.Stop()
-			ticker = time.NewTicker(interval)
+			ticker = time.NewTicker(interval * time.Hour)
 		}
 	}
 }

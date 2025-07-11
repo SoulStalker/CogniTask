@@ -9,13 +9,13 @@ import (
 	tele "gopkg.in/telebot.v3"
 )
 
-func formatTaskList(tasks []domain.Task) [][]tele.InlineButton {
+func FormatTaskList(tasks []domain.Task) [][]tele.InlineButton {
 	var rows [][]tele.InlineButton
 
 	for _, task := range tasks {
 		btn := tele.InlineButton{
 			Unique: keyboards.BtnComplete.Unique,
-			Data: fmt.Sprint(task.ID),
+			Data:   fmt.Sprint(task.ID),
 		}
 		if !task.Closed {
 			btn.Text = fmt.Sprintf("✅ %s : %s", task.Description, task.Deadline.Format("02-01"))

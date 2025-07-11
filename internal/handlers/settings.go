@@ -176,7 +176,7 @@ func (h *SettingsHandler) processNotificationHours(c tele.Context) error {
 	if err := h.fsmService.ClearState(h.ctx, c.Sender().ID); err != nil {
 		log.Printf("Failed to clear state: %v", err)
 	}
-	h.ch <- time.Duration(hours) * time.Second // минуты для тестов
+	h.ch <- time.Duration(hours)// минуты для тестов
 	return c.Edit(cleanHours, keyboards.CreateSettingsKeyboard())
 }
 

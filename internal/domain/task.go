@@ -18,7 +18,7 @@ type TaskRepository interface {
 	EditDate(id uint, newDate time.Time) (Task, error)
 	Delete(id uint) error // удалить задачу
 	GetExpired(deadline time.Time) ([]Task, error)
-	DeleteOldDone(N_days int) (int64, error)
+	DeleteOldDone(N_days uint) (int64, error)
 	GetByID(id uint) (Task, error)
 	All() ([]Task, error)
 }

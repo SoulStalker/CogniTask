@@ -37,10 +37,6 @@ func main() {
 	// 	fmt.Println("Каждые 10 секунд", time.Now())
 	// })
 
-	cr := scheduler.NewScheduler(cron.New())
-	cr.InitDefaultSchedule()
-	
-
 	// Контекст с отменой для graceful shutdown
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -142,8 +138,10 @@ func main() {
 	}()
 
 	// запускаем планировщик
-	notifier := scheduler.NewNotifier(*settingsUC, *taskUC, intervalChan, b)
-	go notifier.TaskNotificationsScheduler(cfg.ChatId)
+	// notifier := scheduler.NewNotifier(*settingsUC, *taskUC, intervalChan, b)
+	// go notifier.TaskNotificationsScheduler(cfg.ChatId)
+	cr := scheduler.NewScheduler(cron.New(), settingsUC, taskUC)
+	cr.InitDefaultSchedule()
 
 	log.Println("Bot started")
 	b.Start()

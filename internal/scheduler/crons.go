@@ -5,6 +5,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/SoulStalker/cognitask/internal/usecase"
 	"github.com/robfig/cron/v3"
 )
 
@@ -15,12 +16,16 @@ import (
 // либо перенсти тикер в крон
 
 type Scheduler struct {
-	cr *cron.Cron
+	cr         *cron.Cron
+	settingsUC *usecase.SettingsService
+	taskUC     *usecase.TaskService
 }
 
-func NewScheduler(cr *cron.Cron) *Scheduler {
+func NewScheduler(cr *cron.Cron, settingsUC *usecase.SettingsService, taskUC *usecase.TaskService) *Scheduler {
 	return &Scheduler{
-		cr: cr,
+		cr:         cr,
+		settingsUC: settingsUC,
+		taskUC:     taskUC,
 	}
 }
 
@@ -68,7 +73,11 @@ func (s *Scheduler) InitDefaultSchedule() {
 
 // Задача по удаление старых записей из базы
 func (s *Scheduler) deleteOldTasks() {
-	s.cr.AddFunc("0 5 * * *", func() { log.Println("В пять утра удалил старые задачи", time.Now()) })
+	N_days, err := s.settingsUC.DeleteOldDataDays()
+	if err != nil {
+		log.Panicln(err)
+	}
+	s.cr.AddFunc(fmt.Sprintf("0 5 * * *"), func() {s.taskUC.DeleteOldDone(N_days)})
 }
 
 // Задача отправляет медиа файлы из базы в заданное время

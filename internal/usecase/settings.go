@@ -39,3 +39,7 @@ func (s *SettingsService) SetRandomHour(hour uint) error {
 func (s *SettingsService) Interval() (uint, error) {
 	return s.repo.Interval()
 }
+
+func (s *SettingsService) DeleteOldDataDays(N_days uint) (uint, error) {
+	return s.repo.DeleteOldDataDays(N_days)
+}

@@ -72,3 +72,12 @@ func (r *GormSettingsRepo) Interval() (uint, error) {
 	}
 	return setting.NotificationHours, nil
 }
+
+func (r *GormSettingsRepo) DeleteOldDataDays(N_days uint) (uint, error) {
+	var setting domain.Settings
+	err := r.DB.First(&setting).Error
+	if err != nil {
+		return 0, err
+	}
+	return setting.DeleteAfterDays, nil
+}

@@ -44,8 +44,8 @@ func (s *TaskService) GetExpired(deadline time.Time) ([]domain.Task, error) {
 	return s.repo.GetExpired(deadline)
 }
 
-func (s *TaskService) DeleteOldDone(N_days int) (int64, error) {
-	return s.repo.DeleteOldDone(N_days)
+func (s *TaskService) DeleteOldDone(N_days uint) {
+	s.repo.DeleteOldDone(N_days)
 }
 
 func (s *TaskService) GetByID(id uint) (domain.Task, error) {

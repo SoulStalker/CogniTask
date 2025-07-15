@@ -43,3 +43,11 @@ func (s *SettingsService) GetNotificationInterval() (uint, error) {
 func (s *SettingsService) GetExpirationDays() (uint, error) {
 	return s.repo.GetExpirationDays()
 }
+
+func (s *SettingsService) GetRandomHour() (uint, error) {
+	return s.repo.GetRandomHour()
+}
+
+func (s *SettingsService) GetNotificationData() (uint, uint, uint, error) {
+	return s.repo.GetNotificationData()
+}

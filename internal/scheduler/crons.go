@@ -49,13 +49,17 @@ func NewScheduler(
 func (s *Scheduler) InitDefaultSchedule() {
 	// авто-удаление старых задач
 	s.deleteOldTasks()
-	// расписаний мотиваций замокано
-	s.SendMediaJob(14)
-	// можно начинать слать задачи с интервалом
+	// расписаний мотиваций 
+	s.SendMediaJob()
+	// задачи с интервалом
 	var notifyEntryID cron.EntryID
 
+	interval, startHour, endHour, err := s.settingsUC.GetNotificationData()
+	if err != nil {
+		log.Println(err)
+	}
 	startJob := RepeatingNotificationJob{
-		Interval: 3 * time.Hour,
+		Interval: time.Duration(interval) * time.Minute,
 		Cron:     s.cr,
 		EntryID:  &notifyEntryID,
 		Scheduler: *s,
@@ -66,8 +70,8 @@ func (s *Scheduler) InitDefaultSchedule() {
 		EntryIDPtr: &notifyEntryID,
 	}
 
-	s.cr.AddJob("00 9 * * *", startJob)
-	s.cr.AddJob("18 16 * * *", stopJob)
+	s.cr.AddJob(fmt.Sprintf("00 %d * * *", startHour), startJob)
+	s.cr.AddJob(fmt.Sprintf("00 %d * * *", endHour), stopJob)
 
 	now := time.Now()
 
@@ -110,7 +114,11 @@ func (s *Scheduler) SendRandomMedia() {
 	}
 }
 
-func (s *Scheduler) SendMediaJob(hour uint) {
+func (s *Scheduler) SendMediaJob() {
+	hour, err := s.settingsUC.GetRandomHour()
+	if err != nil {
+		log.Println(err)
+	}
 	s.cr.AddFunc(fmt.Sprintf("10 %d * * *", hour), s.SendRandomMedia)
 }
 

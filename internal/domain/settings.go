@@ -18,4 +18,6 @@ type SettingsRepository interface {
 	SetRandomHour(hour uint) error
 	GetNotificationInterval() (uint, error)
 	GetExpirationDays() (uint, error)
+	GetRandomHour() (uint, error)
+	GetNotificationData() (uint, uint, uint, error)
 }

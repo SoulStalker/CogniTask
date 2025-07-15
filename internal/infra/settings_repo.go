@@ -81,3 +81,21 @@ func (r *GormSettingsRepo) GetExpirationDays() (uint, error) {
 	}
 	return setting.DeleteAfterDays, nil
 }
+
+func (r *GormSettingsRepo) GetRandomHour() (uint, error) {
+	var setting domain.Settings
+	err := r.DB.First(&setting).Error
+	if err != nil {
+		return 0, err
+	}
+	return setting.RandomHour, nil
+}
+
+func (r *GormSettingsRepo) GetNotificationData() (uint, uint, uint, error) {
+	var setting domain.Settings
+	err := r.DB.First(&setting).Error
+	if err != nil {
+		return 0, 0, 0, err
+	}
+	return setting.NotificationHours, setting.NotifyFrom, setting.NotifyTo, nil
+}

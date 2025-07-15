@@ -16,6 +16,6 @@ type SettingsRepository interface {
 	SetNotifyFrom(hours uint) error
 	SetNotifyTo(hours uint) error
 	SetRandomHour(hour uint) error
-	Interval() (uint, error)
-	DeleteOldDataDays(N_days uint) (uint, error)
+	GetNotificationInterval() (uint, error)
+	GetExpirationDays() (uint, error)
 }

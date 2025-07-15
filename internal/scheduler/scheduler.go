@@ -36,7 +36,7 @@ func NewNotifier(
 func (n *Notifier) TaskNotificationsScheduler(chaiID int64) {
 	recipient := tele.ChatID(chaiID)
 
-	newInterval, err := n.settingsSvc.Interval()
+	newInterval, err := n.settingsSvc.GetNotificationInterval()
 	if err != nil {
 		log.Println(err.Error())
 	}

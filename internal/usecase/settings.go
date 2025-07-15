@@ -36,10 +36,10 @@ func (s *SettingsService) SetRandomHour(hour uint) error {
 	return s.repo.SetRandomHour(hour)
 }
 
-func (s *SettingsService) Interval() (uint, error) {
-	return s.repo.Interval()
+func (s *SettingsService) GetNotificationInterval() (uint, error) {
+	return s.repo.GetNotificationInterval()
 }
 
-func (s *SettingsService) DeleteOldDataDays(N_days uint) (uint, error) {
-	return s.repo.DeleteOldDataDays(N_days)
+func (s *SettingsService) GetExpirationDays() (uint, error) {
+	return s.repo.GetExpirationDays()
 }

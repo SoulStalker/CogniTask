@@ -73,17 +73,18 @@ func (s *Scheduler) InitDefaultSchedule() {
 
 // Задача по удаление старых записей из базы
 func (s *Scheduler) deleteOldTasks() {
-	N_days, err := s.settingsUC.DeleteOldDataDays()
+	N_days, err := s.settingsUC.GetExpirationDays()
 	if err != nil {
 		log.Panicln(err)
 	}
-	s.cr.AddFunc(fmt.Sprintf("0 5 * * *"), func() {s.taskUC.DeleteOldDone(N_days)})
+	// Старые записи удаляются хардкодным расписанием в 4:30 утра
+	s.cr.AddFunc("30 4 * * *", func() {s.taskUC.RemoveOldTasks(int(N_days))})
 }
 
 // Задача отправляет медиа файлы из базы в заданное время
 
 func (s *Scheduler) SendMedia(hour uint) {
-	s.cr.AddFunc(fmt.Sprintf("0 %d * * *", hour),
+	s.cr.AddFunc(fmt.Sprintf("0 %d * * *", hour), 
 		func() {
 			log.Printf("В %d часов отправил файл", hour)
 			log.Println(time.Now())

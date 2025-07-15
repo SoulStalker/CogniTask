@@ -72,7 +72,7 @@ func (r *GormTaskRepo) GetExpired(deadline time.Time) ([]domain.Task, error) {
 	return expiredTasks, nil
 }
 
-func (r *GormTaskRepo) DeleteOldDone(N_days int) (int64, error) {
+func (r *GormTaskRepo) RemoveOldTasks(N_days int) (int64, error) {
 	threshold := time.Now().AddDate(0, 0, -N_days)
 	result := r.DB.Where("closed=?", true).Where("closed_at < ?", threshold).Delete(&domain.Task{})
 	return result.RowsAffected, result.Error

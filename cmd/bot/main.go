@@ -140,7 +140,7 @@ func main() {
 	// запускаем планировщик
 	// notifier := scheduler.NewNotifier(*settingsUC, *taskUC, intervalChan, b)
 	// go notifier.TaskNotificationsScheduler(cfg.ChatId)
-	cr := scheduler.NewScheduler(cron.New(), settingsUC, taskUC)
+	cr := scheduler.NewScheduler(cron.New(), settingsUC, taskUC, mediaUC, b, cfg.ChatId)
 	cr.InitDefaultSchedule()
 
 	log.Println("Bot started")

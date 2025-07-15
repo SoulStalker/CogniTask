@@ -11,14 +11,12 @@ type RepeatingNotificationJob struct {
 	Interval time.Duration
 	Cron     *cron.Cron
 	EntryID  *cron.EntryID
+	Scheduler Scheduler
 }
 
 func (j RepeatingNotificationJob) Run() {
 	entryID, _ := j.Cron.AddFunc(
-		fmt.Sprintf("@every %s", j.Interval),
-		func() {
-			fmt.Printf("🔔 Повторное уведомление (%s)\n", time.Now())
-		},
+		fmt.Sprintf("@every %s", j.Interval), j.Scheduler.Notifier,
 	)
 
 	*j.EntryID = entryID

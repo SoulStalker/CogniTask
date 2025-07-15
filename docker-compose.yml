@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  bot:
+    build: .
+    env_file:
+      - .env
+    volumes:
+      - ./bot.db:/app/bot.db
+    depends_on:
+      - redis
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+volumes:
+  redis_data:

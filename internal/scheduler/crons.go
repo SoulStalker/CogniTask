@@ -12,12 +12,6 @@ import (
 	tele "gopkg.in/telebot.v3"
 )
 
-// надо добавить расписания для автоудаления сообщений (проверять раз в день и удалять все что старше заданных дней)
-// расписание для моитиваций
-// расписание для запуска уведомлений
-// расписание для остановки уведомлений
-// либо перенсти тикер в крон
-
 type Scheduler struct {
 	cr         *cron.Cron
 	settingsUC *usecase.SettingsService
@@ -59,7 +53,7 @@ func (s *Scheduler) InitDefaultSchedule() {
 		log.Println(err)
 	}
 	startJob := RepeatingNotificationJob{
-		Interval: time.Duration(interval) * time.Minute,
+		Interval: time.Duration(interval) * time.Hour,
 		Cron:     s.cr,
 		EntryID:  &notifyEntryID,
 		Scheduler: *s,

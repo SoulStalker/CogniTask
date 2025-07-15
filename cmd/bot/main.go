@@ -30,13 +30,6 @@ func main() {
 	// Канал для планировщика
 	var intervalChan = make(chan time.Duration)
 
-	// крон
-	// cr := cron.New()
-
-	// cr.AddFunc("@every 10s", func() {
-	// 	fmt.Println("Каждые 10 секунд", time.Now())
-	// })
-
 	// Контекст с отменой для graceful shutdown
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

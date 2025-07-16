@@ -27,8 +27,6 @@ import (
 )
 
 func main() {
-	// Канал для планировщика
-	var intervalChan = make(chan time.Duration)
 
 	// Контекст с отменой для graceful shutdown
 	ctx, cancel := context.WithCancel(context.Background())
@@ -70,10 +68,13 @@ func main() {
 	// init fsm
 	fsmService := fsm.NewFSMService(rdb, cfg.FSMTimeout)
 
+	// запускаем планировщик
+	cr := scheduler.NewScheduler(cron.New(), settingsUC, taskUC, mediaUC, nil, cfg.ChatId) // bot пока nil
+
 	// init handler
 	th := handlers.NewTaskHandler(fsmService, taskUC, ctx)
 	mh := handlers.NewMediaHandler(mediaUC, ctx)
-	sh := handlers.NewSettingsHandler(fsmService, *settingsUC, ctx, intervalChan)
+	sh := handlers.NewSettingsHandler(fsmService, *settingsUC, ctx, cr.GetUpdateChannel())
 	cbRouter := handlers.NewCallbackRouter([]handlers.CallbackHandler{th, sh}, fsmService, ctx)
 
 	// run bot polling
@@ -82,8 +83,12 @@ func main() {
 		Poller: &tele.LongPoller{Timeout: 10 * time.Second},
 	})
 	if err != nil {
-		return
+		log.Fatal(err)
 	}
+
+	// Устанавливаем бота в планировщик
+	cr.SetBot(b)
+
 	if err = b.SetCommands(messages.Commands); err != nil {
 		log.Fatalf("Не удалось установить команды: %v", err)
 	}
@@ -105,7 +110,6 @@ func main() {
 
 	// media
 	b.Handle(tele.OnMedia, mh.Create)
-	// b.Handle(keyboards.BtnRandomPic, mh.Random)
 
 	// settings
 	b.Handle(keyboards.BtnSettings, sh.Settings)
@@ -119,6 +123,9 @@ func main() {
 	b.Handle(tele.OnCallback, cbRouter.Handle)
 	b.Handle(keyboards.BtnCancel, th.Cancel)
 
+	// запуск планировщика
+	cr.InitDefaultSchedule()
+
 	// Graceful shutdown
 	go func() {
 		sigChan := make(chan os.Signal, 1)
@@ -126,15 +133,10 @@ func main() {
 		<-sigChan
 
 		log.Println("Shutting down bot...")
+		cr.Stop() // Надо остановить крон перед остановкой бота
 		b.Stop()
 		cancel()
 	}()
-
-	// запускаем планировщик
-	// notifier := scheduler.NewNotifier(*settingsUC, *taskUC, intervalChan, b)
-	// go notifier.TaskNotificationsScheduler(cfg.ChatId)
-	cr := scheduler.NewScheduler(cron.New(), settingsUC, taskUC, mediaUC, b, cfg.ChatId)
-	cr.InitDefaultSchedule()
 
 	log.Println("Bot started")
 	b.Start()

@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   bot:
     build: .
@@ -6,10 +5,12 @@ services:
       - .env
     volumes:
       - ./bot.db:/app/bot.db
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
     depends_on:
       - redis
   redis:
-    image: redis:7-alpine
+    image: redis:8-alpine
     volumes:
       - redis_data:/data
 volumes:

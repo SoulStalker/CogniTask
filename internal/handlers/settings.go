@@ -116,7 +116,7 @@ func (h *SettingsHandler) processDeleteDays(c tele.Context) error {
 		log.Printf("Failed to clear state: %v", err)
 	}
 
-	return c.Edit(fmt.Sprintf("✅ Установлено %d дней для авто-удаления", cleanDays), keyboards.CreateSettingsKeyboard())
+	return c.Edit(fmt.Sprintf("✅ Установлено %s дней для авто-удаления", cleanDays), keyboards.CreateSettingsKeyboard())
 }
 
 func (h *SettingsHandler) processNotificationHours(c tele.Context) error {
@@ -142,7 +142,7 @@ func (h *SettingsHandler) processNotificationHours(c tele.Context) error {
 	if err := h.fsmService.ClearState(h.ctx, c.Sender().ID); err != nil {
 		log.Printf("Failed to clear state: %v", err)
 	}
-	return c.Edit(fmt.Sprintf("✅ Установлен интервал %d часов", cleanHours), keyboards.CreateSettingsKeyboard())
+	return c.Edit(fmt.Sprintf("✅ Установлен интервал %s часов", cleanHours), keyboards.CreateSettingsKeyboard())
 }
 
 func (h *SettingsHandler) processNotifyFrom(c tele.Context) error {
@@ -169,7 +169,7 @@ func (h *SettingsHandler) processNotifyFrom(c tele.Context) error {
 		log.Printf("Failed to clear state: %v", err)
 	}
 
-	return c.Edit(fmt.Sprintf("✅ Начало уведомлений в %d:00", cleanHours), keyboards.CreateSettingsKeyboard())
+	return c.Edit(fmt.Sprintf("✅ Начало уведомлений в %s:00", cleanHours), keyboards.CreateSettingsKeyboard())
 }
 
 func (h *SettingsHandler) processNotifyTo(c tele.Context) error {
@@ -196,7 +196,7 @@ func (h *SettingsHandler) processNotifyTo(c tele.Context) error {
 		log.Printf("Failed to clear state: %v", err)
 	}
 
-	return c.Edit(fmt.Sprintf("✅ Конец уведомлений в %d:00", cleanHours), keyboards.CreateSettingsKeyboard())
+	return c.Edit(fmt.Sprintf("✅ Конец уведомлений в %s:00", cleanHours), keyboards.CreateSettingsKeyboard())
 }
 
 func (h *SettingsHandler) processRandomHour(c tele.Context) error {
@@ -219,7 +219,7 @@ func (h *SettingsHandler) processRandomHour(c tele.Context) error {
 		log.Printf("Failed to clear state: %v", err)
 	}
 
-	return c.Edit(fmt.Sprintf("✅ Мотиватор будет приходить в %d:00", cleanHour), keyboards.CreateSettingsKeyboard())
+	return c.Edit(fmt.Sprintf("✅ Мотиватор будет приходить в %s:00", cleanHour), keyboards.CreateSettingsKeyboard())
 }
 
 func (h *SettingsHandler) setState(c tele.Context, newState string) error {

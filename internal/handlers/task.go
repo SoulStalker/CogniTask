@@ -9,6 +9,7 @@ import (
 	"github.com/SoulStalker/cognitask/internal/domain"
 	"github.com/SoulStalker/cognitask/internal/fsm"
 	"github.com/SoulStalker/cognitask/internal/keyboards"
+	"github.com/SoulStalker/cognitask/internal/mappers"
 	"github.com/SoulStalker/cognitask/internal/messages"
 	"github.com/SoulStalker/cognitask/internal/usecase"
 	tele "gopkg.in/telebot.v3"
@@ -60,7 +61,7 @@ func (h *TaskHandler) Pending(c tele.Context) error {
 		return c.Edit(messages.BotMessages.NoOpenTasks, keyboards.CreateMainKeyboard())
 	}
 
-	rows := FormatTaskList(tasks)
+	rows := mappers.FormatTaskList(tasks)
 
 	return c.Edit(messages.BotMessages.YourTasks, &tele.ReplyMarkup{InlineKeyboard: rows})
 }
@@ -80,7 +81,7 @@ func (h *TaskHandler) All(c tele.Context) error {
 		return c.Edit(messages.BotMessages.NoTasks, keyboards.CreateMainKeyboard())
 	}
 
-	rows := FormatTaskList(tasks)
+	rows := mappers.FormatTaskList(tasks)
 
 	return c.Edit(messages.BotMessages.YourTasks, &tele.ReplyMarkup{InlineKeyboard: rows})
 }
@@ -207,5 +208,5 @@ func (h *TaskHandler) createTask(c tele.Context, state *fsm.FSMData) error {
 	if err != nil {
 		return c.Send(err.Error())
 	}
-	return c.Send(formatTask(task), keyboards.CreateMainKeyboard())
+	return c.Send(mappers.FormatTask(task), keyboards.CreateMainKeyboard())
 }

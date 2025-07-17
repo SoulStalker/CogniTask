@@ -1,4 +1,4 @@
-package handlers
+package mappers
 
 import (
 	"fmt"
@@ -31,7 +31,7 @@ func FormatTaskList(tasks []domain.Task) [][]tele.InlineButton {
 	return rows
 }
 
-func formatTask(task domain.Task) string {
+func FormatTask(task domain.Task) string {
 	return fmt.Sprintf(
 		"%s\n\n%s\n%s",
 		messages.BotMessages.TaskAdded,

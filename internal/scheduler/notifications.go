@@ -8,9 +8,9 @@ import (
 )
 
 type RepeatingNotificationJob struct {
-	Interval time.Duration
-	Cron     *cron.Cron
-	EntryID  *cron.EntryID
+	Interval  time.Duration
+	Cron      *cron.Cron
+	EntryID   *cron.EntryID
 	Scheduler Scheduler
 }
 
@@ -20,15 +20,15 @@ func (j RepeatingNotificationJob) Run() {
 	)
 
 	*j.EntryID = entryID
-	fmt.Printf("▶️ Начал уведомления (%s)\n", j.Interval)
+	fmt.Printf("▶️ Начал уведомления (%s) Задача %d\n", j.Interval, j.EntryID)
 }
 
 type StopNotificationJob struct {
 	Cron       *cron.Cron
-	EntryIDPtr *cron.EntryID
+	EntryID *cron.EntryID
 }
 
 func (j StopNotificationJob) Run() {
-	j.Cron.Remove(*j.EntryIDPtr)
+	j.Cron.Remove(*j.EntryID)
 	fmt.Printf("⛔ Уведомления остановлены (%s)\n", time.Now())
 }

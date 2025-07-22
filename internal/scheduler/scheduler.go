@@ -36,7 +36,6 @@ type Scheduler struct {
 	// Для отслеживания активных задач
 	notifyStartEntryID cron.EntryID
 	notifyStopEntryID  cron.EntryID
-	notifyTaskEntryID  cron.EntryID
 	mediaEntryID       cron.EntryID
 	deleteEntryID      cron.EntryID
 
@@ -155,14 +154,14 @@ func (s *Scheduler) updateMediaSchedule() {
 	}
 
 	s.setupMediaSchedule()
-	log.Println("Расписание по отправке медиа обновлено")
+	log.Printf("Расписание по отправке медиа обновлено\n")
 }
 
 // setupNotificationSchedule настраивает расписание уведомлений
 func (s *Scheduler) setupNotificationSchedule() {
 	interval, startHour, endHour, err := s.settingsUC.GetNotificationData()
 	if err != nil {
-		log.Printf("Не смог получить данные по оповещениям из базы: %v", err)
+		log.Printf("Не смог получить данные по оповещениям из базы: %v\n", err)
 		return
 	}
 
@@ -172,32 +171,36 @@ func (s *Scheduler) setupNotificationSchedule() {
 	var notifyEntryID cron.EntryID
 
 	startJob := RepeatingNotificationJob{
-		Interval:  time.Duration(interval) * time.Hour,
+		Interval:  time.Duration(interval) * time.Minute, // todo вернуть hour
 		Cron:      s.cr,
 		EntryID:   &notifyEntryID,
 		Scheduler: *s,
 	}
 
 	stopJob := StopNotificationJob{
-		Cron:       s.cr,
-		EntryIDPtr: &notifyEntryID,
+		Cron:    s.cr,
+		EntryID: &notifyEntryID,
 	}
 
 	// Задачи запуска и остановки
-	startEntryID, err := s.cr.AddJob(fmt.Sprintf("0 %d * * *", startHour), startJob)
+	startEntryID, err := s.cr.AddJob(fmt.Sprintf("%d * * * *", startHour), startJob) // todo вернуть часы
 	if err != nil {
-		log.Printf("Ошибка добавления задачи запуска уведомлений: %v", err)
+		log.Printf("Ошибка добавления задачи запуска уведомлений: %v\n", err)
 		return
 	}
 
-	stopEntryID, err := s.cr.AddJob(fmt.Sprintf("0 %d * * *", endHour), stopJob)
+	stopEntryID, err := s.cr.AddJob(fmt.Sprintf("%d * * * *", endHour), stopJob) // todo вернуть часы
 	if err != nil {
-		log.Printf("Ошибка добавления задачи остановки уведомлений: %v", err)
+		log.Printf("Ошибка добавления задачи остановки уведомлений: %v\n", err)
 		return
 	}
+
+	log.Printf("startEntryID=%d, stopEntryID=%d", startEntryID, stopEntryID) //todo
 
 	s.notifyStartEntryID = startEntryID
 	s.notifyStopEntryID = stopEntryID
+
+	log.Println(s.notifyStartEntryID, s.notifyStopEntryID) // todo
 
 	now := time.Now()
 	start := time.Date(now.Year(), now.Month(), now.Day(), int(startHour), 0, 0, 0, time.Local)
@@ -205,10 +208,10 @@ func (s *Scheduler) setupNotificationSchedule() {
 
 	// если бот перезапустился после запуска расписания, запускаем задание
 	if now.After(start) && now.Before(end) {
-		startJob.Run()
+		s.Notifier()
 	}
 
-	log.Printf("Обновлено расписание уведомлений: Каждые %d часов с %d:00 до %d:00", interval, startHour, endHour)
+	log.Printf("Обновлено расписание уведомлений: Каждые %d часов с %d:00 до %d:00\n", interval, startHour, endHour)
 }
 
 // updateNotificationSchedule обновляет расписание уведомлений
@@ -225,9 +228,6 @@ func (s *Scheduler) removeNotificationTasks() {
 	}
 	if s.notifyStopEntryID != 0 {
 		s.cr.Remove(s.notifyStopEntryID)
-	}
-	if s.notifyTaskEntryID != 0 {
-		s.cr.Remove(s.notifyTaskEntryID)
 	}
 }
 
@@ -266,7 +266,7 @@ func (s *Scheduler) Notifier() {
 	}
 
 	if len(currentTasks) == 0 {
-		s.bot.Send(recipient, "Новых задач нет")
+		s.bot.Send(recipient, "Новых задач нет ")
 		return
 	}
 

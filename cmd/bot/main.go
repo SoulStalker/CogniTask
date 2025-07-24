@@ -107,6 +107,7 @@ func main() {
 	b.Handle(keyboards.BtnComplete, th.Complete)
 	b.Handle(keyboards.BtnDelete, th.Delete)
 	b.Handle(keyboards.BtnAll, th.All)
+	b.Handle(keyboards.BtnCalendar, th.SelectDate)
 
 	// media
 	b.Handle(tele.OnMedia, mh.Create)

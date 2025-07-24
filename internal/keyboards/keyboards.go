@@ -2,6 +2,8 @@ package keyboards
 
 import (
 	"fmt"
+	"strconv"
+	"time"
 
 	tele "gopkg.in/telebot.v3"
 )
@@ -149,4 +151,56 @@ func CreateHoursKeyboard(rowsCount int) *tele.ReplyMarkup {
 
 	kb.Inline(rows...)
 	return kb
+}
+
+/* ---------- построение календаря ---------- */
+
+func BuildKeyboard(year int, month time.Month) *tele.ReplyMarkup {
+	const (
+		btnWidth = 7 // 7 дней в строке
+	)
+
+	loc := time.Local
+	firstOfMonth := time.Date(year, month, 1, 0, 0, 0, 0, loc)
+	daysInMonth := firstOfMonth.AddDate(0, 1, -1).Day()
+	weekdayOffset := int(firstOfMonth.Weekday())
+	if weekdayOffset == 0 { // в Go Sunday==0, хотим, чтобы Monday==0
+		weekdayOffset = 6
+	} else {
+		weekdayOffset--
+	}
+
+	m := &tele.ReplyMarkup{}
+
+	// навигация
+	prev := firstOfMonth.AddDate(0, -1, 0)
+	next := firstOfMonth.AddDate(0, 1, 0)
+	btnPrev := m.Data("◀︎", "nav_prev",
+		fmt.Sprintf("NAV|%d|%d", prev.Year(), int(prev.Month())))
+	btnNext := m.Data("▶︎", "nav_next",
+		fmt.Sprintf("NAV|%d|%d", next.Year(), int(next.Month())))
+	m.Inline(
+		m.Row(btnPrev, btnNext),
+	)
+
+	// пустые ячейки до 1-го числа
+	cells := make([]tele.Btn, weekdayOffset)
+	for i := range cells {
+		cells[i] = m.Data(" ", "empty", "x") // «пустая» кнопка
+	}
+
+	// сами дни
+	for d := 1; d <= daysInMonth; d++ {
+		date := fmt.Sprintf("DAY|%d|%02d|%02d", year, month, d)
+		cells = append(cells, m.Data(strconv.Itoa(d), "day", date))
+	}
+
+	// разбиваем в строки по 7 кнопок
+	for len(cells)%btnWidth != 0 {
+		cells = append(cells, m.Data(" ", "empty", "x"))
+	}
+	for i := 0; i < len(cells); i += btnWidth {
+		m.InlineKeyboard = append(m.InlineKeyboard, cells[i:i+btnWidth])
+	}
+	return m
 }

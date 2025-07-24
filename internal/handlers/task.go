@@ -6,6 +6,7 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/SoulStalker/cognitask/internal/domain"
 	"github.com/SoulStalker/cognitask/internal/fsm"
@@ -13,6 +14,7 @@ import (
 	"github.com/SoulStalker/cognitask/internal/mappers"
 	"github.com/SoulStalker/cognitask/internal/messages"
 	"github.com/SoulStalker/cognitask/internal/usecase"
+	tb_cal "github.com/oramaz/telebot-calendar"
 	tele "gopkg.in/telebot.v3"
 )
 
@@ -227,4 +229,24 @@ func (h *TaskHandler) createTask(c tele.Context, state *fsm.FSMData) error {
 		return c.Send(err.Error())
 	}
 	return c.Send(mappers.FormatTask(task), keyboards.CreateMainKeyboard())
+}
+
+func (h *TaskHandler) SelectDate(c tele.Context) error {
+	calendar := tb_cal.NewCalendar(c.Bot(), tb_cal.Options{
+		YearRange: [2]int{2025, 2030},
+		Language:  "ru",
+	})
+	return c.Send("Выбери дату:", calendar.GetKeyboard())
+}
+
+func sendCalendar(b *tele.Bot, c tele.Context, year int, month time.Month) error {
+	markup := keyboards.BuildKeyboard(year, month)
+	title := fmt.Sprintf("%s %d", month.String(), year)
+	return c.Send(c.Sender(), title, markup)
+}
+
+func editCalendar(b *tele.Bot, c tele.Context, year int, month time.Month) error {
+	markup := keyboards.BuildKeyboard(year, month)
+	title := fmt.Sprintf("%s %d", month.String(), year)
+	return c.EditCaption("c.Message()", title, markup)
 }

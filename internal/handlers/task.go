@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"strconv"
 	"strings"
@@ -108,6 +109,23 @@ func (h *TaskHandler) Add(c tele.Context) error {
 		c.Edit(messages.BotMessages.ErrorSomeError)
 	}
 	return c.Edit(messages.BotMessages.InputTaskText, keyboards.CreateCancelKeyboard())
+}
+
+// textToTask если бот получил просто текст, можем из него сделать задачу
+func (h *TaskHandler) textToTask(c tele.Context, state *fsm.FSMData) error {
+	userID := c.Sender().ID
+	state.TaskText = c.Text()
+	state.State = fsm.StateWaitingTaskDate
+
+	fmt.Println(state.State)
+
+	// Надо сохранить новое состояние
+	if err := h.fsmService.SetState(h.ctx, userID, state); err != nil {
+		log.Printf("Failed to update state: %v", err)
+		return c.Send(messages.BotMessages.ErrorTryAgain)
+	}
+	return c.Send(messages.BotMessages.InputNewDate, keyboards.GetDateSelectionKeyboard())
+
 }
 
 // processTaskText в фсм состоянии ждет название таска

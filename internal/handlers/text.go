@@ -26,7 +26,6 @@ func (h *TaskHandler) HandleText(c tele.Context) error {
 	case fsm.StateWaitingTaskDate:
 		return h.processTaskDate(c, state)
 	default:
-		return c.Send(messages.BotMessages.UnknownText, c.Text())
+		return h.textToTask(c, state)
 	}
-
 }

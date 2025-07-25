@@ -14,7 +14,6 @@ import (
 	"github.com/SoulStalker/cognitask/internal/mappers"
 	"github.com/SoulStalker/cognitask/internal/messages"
 	"github.com/SoulStalker/cognitask/internal/usecase"
-	tb_cal "github.com/oramaz/telebot-calendar"
 	tele "gopkg.in/telebot.v3"
 )
 
@@ -232,21 +231,56 @@ func (h *TaskHandler) createTask(c tele.Context, state *fsm.FSMData) error {
 }
 
 func (h *TaskHandler) SelectDate(c tele.Context) error {
-	calendar := tb_cal.NewCalendar(c.Bot(), tb_cal.Options{
-		YearRange: [2]int{2025, 2030},
-		Language:  "ru",
-	})
-	return c.Send("Выбери дату:", calendar.GetKeyboard())
+	// Создаем карту (map) для перевода месяцев
+	monthTranslations := map[time.Month]string{
+		time.January:   "Январь",
+		time.February:  "Февраль",
+		time.March:     "Март",
+		time.April:     "Апрель",
+		time.May:       "Май",
+		time.June:      "Июнь",
+		time.July:      "Июль",
+		time.August:    "Август",
+		time.September: "Сентябрь",
+		time.October:   "Октябрь",
+		time.November:  "Ноябрь",
+		time.December:  "Декабрь",
+	}
+
+	year := time.Now().Year()
+	month := monthTranslations[time.Now().Month()]
+	markup := keyboards.BuildKeyboard(year, time.Now().Month())
+	title := fmt.Sprintf("%s %d", month, year)
+	return c.Send(title, markup)
 }
 
-func sendCalendar(b *tele.Bot, c tele.Context, year int, month time.Month) error {
-	markup := keyboards.BuildKeyboard(year, month)
-	title := fmt.Sprintf("%s %d", month.String(), year)
-	return c.Send(c.Sender(), title, markup)
-}
+// func sendCalendar(b *tele.Bot, c tele.Context, year int, month time.Month) error {
+// 	markup := keyboards.BuildKeyboard(year, month)
+// 	title := fmt.Sprintf("%s %d", month.String(), year)
+// 	return c.Send(c.Sender(), title, markup)
+// }
 
-func editCalendar(b *tele.Bot, c tele.Context, year int, month time.Month) error {
-	markup := keyboards.BuildKeyboard(year, month)
-	title := fmt.Sprintf("%s %d", month.String(), year)
-	return c.EditCaption("c.Message()", title, markup)
+// func editCalendar(b *tele.Bot, c tele.Context, year int, month time.Month) error {
+// 	markup := keyboards.BuildKeyboard(year, month)
+// 	title := fmt.Sprintf("%s %d", month.String(), year)
+// 	return c.EditCaption("c.Message()", title, markup)
+// }
+
+// Функция преобразует строку формата "day|DAY|YYYY|MM|DD" в "DD.MM.YYYY"
+func mapDateString(input string) (string, error) {
+	parts := strings.Split(input, "|")
+	if len(parts) != 5 {
+		return "", fmt.Errorf("неверный формат строки, ожидается day|DAY|YYYY|MM|DD")
+	}
+
+	year := parts[2]  // YYYY
+	month := parts[3] // MM
+	day := parts[4]   // DD
+
+	// Проверяем, что компоненты даты корректны (можно добавить дополнительные проверки)
+	if len(year) != 4 || len(month) != 2 || len(day) != 2 {
+		return "", fmt.Errorf("некорректный формат даты")
+	}
+
+	return fmt.Sprintf("%s.%s.%s", day, month, year), nil
 }

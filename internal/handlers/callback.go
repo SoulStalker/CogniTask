@@ -44,5 +44,5 @@ func (r *CallbackRouter) Handle(c tele.Context) error {
 		}
 	}
 
-	return c.Send(fmt.Sprintf("Wrong callback int state %s", data))
+	return c.Send(fmt.Sprintf("Wrong callback %v int state %s", c.Callback().Data, data))
 }

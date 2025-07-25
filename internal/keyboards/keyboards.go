@@ -156,51 +156,53 @@ func CreateHoursKeyboard(rowsCount int) *tele.ReplyMarkup {
 /* ---------- построение календаря ---------- */
 
 func BuildKeyboard(year int, month time.Month) *tele.ReplyMarkup {
-	const (
-		btnWidth = 7 // 7 дней в строке
-	)
+	const btnWidth = 7 // по 7 кнопок-дней в строке
 
 	loc := time.Local
-	firstOfMonth := time.Date(year, month, 1, 0, 0, 0, 0, loc)
-	daysInMonth := firstOfMonth.AddDate(0, 1, -1).Day()
-	weekdayOffset := int(firstOfMonth.Weekday())
-	if weekdayOffset == 0 { // в Go Sunday==0, хотим, чтобы Monday==0
-		weekdayOffset = 6
-	} else {
-		weekdayOffset--
-	}
+	first := time.Date(year, month, 1, 0, 0, 0, 0, loc)
+	daysInMonth := first.AddDate(0, 1, -1).Day()
+
+	// насколько сместить первую строку (0 – понедельник)
+	weekdayOffset := (int(first.Weekday()) + 6) % 7
 
 	m := &tele.ReplyMarkup{}
 
-	// навигация
-	prev := firstOfMonth.AddDate(0, -1, 0)
-	next := firstOfMonth.AddDate(0, 1, 0)
+	// Кнопки навигации (прошлый / следующий месяцы)
+	prev := first.AddDate(0, -1, 0)
+	next := first.AddDate(0, +1, 0)
+
 	btnPrev := m.Data("◀︎", "nav_prev",
 		fmt.Sprintf("NAV|%d|%d", prev.Year(), int(prev.Month())))
 	btnNext := m.Data("▶︎", "nav_next",
 		fmt.Sprintf("NAV|%d|%d", next.Year(), int(next.Month())))
-	m.Inline(
-		m.Row(btnPrev, btnNext),
-	)
 
-	// пустые ячейки до 1-го числа
-	cells := make([]tele.Btn, weekdayOffset)
-	for i := range cells {
-		cells[i] = m.Data(" ", "empty", "x") // «пустая» кнопка
+	// первая строка – стрелки
+	m.Inline(m.Row(btnPrev, btnNext))
+
+	// собираем все «ячейки» месяца
+	cells := make([]tele.InlineButton, 0, weekdayOffset+daysInMonth)
+
+	// пустые кнопки до 1-го числа
+	for i := 0; i < weekdayOffset; i++ {
+		btn := m.Data(" ", "empty", "x")
+		cells = append(cells, *btn.Inline())
 	}
-
 	// сами дни
 	for d := 1; d <= daysInMonth; d++ {
-		date := fmt.Sprintf("DAY|%d|%02d|%02d", year, month, d)
-		cells = append(cells, m.Data(strconv.Itoa(d), "day", date))
+		cb := fmt.Sprintf("DAY|%d|%02d|%02d", year, month, d)
+		btn := m.Data(strconv.Itoa(d), "day", cb)
+		cells = append(cells, *btn.Inline())
+	}
+	// добить строку до кратности 7, чтобы сетка была ровная
+	for len(cells)%btnWidth != 0 {
+		btn := m.Data(" ", "empty", "x")
+		cells = append(cells, *btn.Inline())
 	}
 
-	// разбиваем в строки по 7 кнопок
-	for len(cells)%btnWidth != 0 {
-		cells = append(cells, m.Data(" ", "empty", "x"))
-	}
+	// разбиваем на строки по 7 кнопок
 	for i := 0; i < len(cells); i += btnWidth {
-		m.InlineKeyboard = append(m.InlineKeyboard, cells[i:i+btnWidth])
+		row := cells[i : i+btnWidth] // []InlineButton
+		m.InlineKeyboard = append(m.InlineKeyboard, row)
 	}
 	return m
 }
